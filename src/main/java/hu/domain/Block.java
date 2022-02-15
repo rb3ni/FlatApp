@@ -16,12 +16,12 @@ public class Block {
     private String description;
     private int numberOfFlats;
     private int numberOfFloors;
-    private List<Space> spaces;
-    private List<Account> accounts;
+    private List<Integer> spaces;
+    private List<Integer> accounts;
     private Date paymentDeadline;
 
     public Block(int id, String city, int postalCode, String street, int houseNumber, String description,
-                 int numberOfFlats, int numberOfFloors, List<Space> spaces, List<Account> accounts,
+                 int numberOfFlats, int numberOfFloors, List<Integer> spaces, List<Integer> accounts,
                  Date paymentDeadline) {
         this.id = id;
         this.city = city;

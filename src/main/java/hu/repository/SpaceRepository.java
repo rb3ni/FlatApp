@@ -1,11 +1,11 @@
 package hu.repository;
 
-import hu.domain.account.Account;
-import hu.domain.account.ExternalService;
-import hu.domain.account.Habitant;
+import hu.domain.space.FlatType;
 import hu.domain.space.Space;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
@@ -46,19 +46,18 @@ public class SpaceRepository {
         String insertAccountStatement = "INSERT INTO space VALUES (?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
 
-            preparedStatement.setInt(1, space.getId());               //AUTO_INCREMENT??
             preparedStatement.setInt(2, space.getFloor());
             preparedStatement.setInt(3, space.getDoor());
             preparedStatement.setDouble(4, space.getFlatType().getNumber_of_rooms());
             preparedStatement.setInt(5, space.getFlatType().getArea());
             preparedStatement.setBoolean(6, space.getFlatType().isHasBalcony());
             preparedStatement.setInt(7, space.getFlatType().getCost());
-            preparedStatement.setString(7, space.getFlatType().getDescription()); // Lehet tableban VARCHAR legyen akkor
-            preparedStatement.setString(8, space.getFlatType().name());
-            preparedStatement.setInt(9, space.getBlock().getId());
+            preparedStatement.setString(8, space.getFlatType().getDescription()); // Lehet tableban VARCHAR legyen akkor
+            preparedStatement.setString(9, space.getFlatType().name());
+            preparedStatement.setInt(10, space.getBlockId());
 
             preparedStatement.executeUpdate();
-            infoBack = "Account created";
+            infoBack = "Space created";
         } catch (
                 SQLException throwables) {
             throwables.printStackTrace();
@@ -66,36 +65,39 @@ public class SpaceRepository {
         return infoBack;
     }
 
-    public Account searchAccountById(int id) {
-        Account account = null;
-        String sql = "SELECT * FROM account a\n" +
-                "WHERE a.id = ?;";
+    public Space searchSpaceById(int id) {
+        Space space = null;
+        String sql = "SELECT * FROM space s " +
+                "JOIN property_table pt ON pt.space_id = s.id " +
+                "WHERE s.id = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            while (resultSet.next()) {
-                if (resultSet.getBoolean("is_habitant")) {
-                    account = new Habitant(resultSet.getString("name"),
-                            resultSet.getInt("phone_number"),
-                            resultSet.getString("email"),
-                            resultSet.getString("responsibility"),
-                            resultSet.getInt("cost"),
-                            resultSet.getInt("age"),
-                            resultSet.getString("occupation"));
-                } else {
-                    account = new ExternalService(resultSet.getString("name"),
-                            resultSet.getInt("phone_number"),
-                            resultSet.getString("email"),
-                            resultSet.getString("responsibility"),
-                            resultSet.getInt("cost"),
-                            resultSet.getString("company_name"));
-                }
-            }
+            int spaceFloor = resultSet.getInt("floor");
+            int spaceDoor = resultSet.getInt("door");
+            FlatType flatTypeOfSpace = FlatType.valueOf(resultSet.getString("space_type"));
+            Integer blockId = resultSet.getInt("block_id");
+            List<Integer> habitantIdList = getHabitantsId(resultSet);
+
+            return new Space(id, spaceFloor, spaceDoor, habitantIdList, flatTypeOfSpace, blockId);
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return account;
+        return null;
+    }
+
+    private List<Integer> getHabitantsId(ResultSet resultSet) {
+        List<Integer> idList = new ArrayList<>();
+        try {
+            while (resultSet.next()) {
+                idList.add(resultSet.getInt("pt.account_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return idList;
     }
 }
