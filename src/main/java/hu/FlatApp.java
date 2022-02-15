@@ -1,5 +1,6 @@
 package hu;
 
+import hu.domain.Block;
 import hu.domain.space.FlatType;
 import hu.domain.account.Habitant;
 import hu.domain.space.Space;
@@ -10,6 +11,7 @@ public class FlatApp {
     public static void main(String[] args) {
         Habitant habitant;
         Space space;
+        Block block = null;
 
         habitant = new Habitant("Bruce Wayne",
                 5551234,
@@ -22,7 +24,8 @@ public class FlatApp {
         space = new Space(1,
                 6,
                 List.of(habitant),
-                FlatType.FLAT_A);
+                FlatType.FLAT_A,
+                block);
 
         System.out.println(space);
         String hehe = "hehe";
