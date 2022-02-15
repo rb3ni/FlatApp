@@ -5,6 +5,7 @@ import hu.domain.account.ExternalService;
 import hu.domain.account.Habitant;
 
 import java.sql.*;
+import java.util.Random;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
@@ -22,7 +23,7 @@ public class AccountRepository {
 
     public void createAccountTable() {
         String sqlCreateTable = "CREATE TABLE IF NOT EXISTS account (" +
-                "id INT NOT NULL AUTO_INCREMENT, " +
+                "id INT PRIMARY KEY, " +
                 "name VARCHAR(50) NOT NULL, " +
                 "phone_number INT, " +
                 "email VARCHAR(50) NOT NULL, " +
@@ -44,6 +45,7 @@ public class AccountRepository {
         String insertAccountStatement = "INSERT INTO account VALUES (?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
 
+            preparedStatement.setInt(1, generateId());
             preparedStatement.setString(2, account.getName());
             preparedStatement.setInt(3, account.getPhoneNumber());
             preparedStatement.setString(4, account.getEmail());
@@ -70,6 +72,18 @@ public class AccountRepository {
         return infoBack;
     }
 
+    private int generateId() {
+        Random random = new Random();
+        int id = 100000 + random.nextInt(899999);
+
+        if (searchAccountById(id) != null){
+            while (searchAccountById(id) != null){
+                id = 100000 + random.nextInt(899999);
+            }
+        }
+        return id;
+    }
+
     public Account searchAccountById(int id) {
         Account account = null;
         String sql = "SELECT * FROM account a\n" +
@@ -81,7 +95,9 @@ public class AccountRepository {
 
             while (resultSet.next()) {
                 if (resultSet.getBoolean("is_habitant")) {
-                    account = new Habitant(resultSet.getString("name"),
+                    account = new Habitant(
+                            resultSet.getInt("id"),
+                            resultSet.getString("name"),
                             resultSet.getInt("phone_number"),
                             resultSet.getString("email"),
                             resultSet.getString("responsibility"),
@@ -89,7 +105,9 @@ public class AccountRepository {
                             resultSet.getInt("age"),
                             resultSet.getString("occupation"));
                 } else {
-                    account = new ExternalService(resultSet.getString("name"),
+                    account = new ExternalService(
+                            resultSet.getInt("id"),
+                            resultSet.getString("name"),
                             resultSet.getInt("phone_number"),
                             resultSet.getString("email"),
                             resultSet.getString("responsibility"),

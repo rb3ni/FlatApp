@@ -25,7 +25,7 @@ public class TransactionRepository {
     public void createTransactionTable() {
         String sqlCreateTable = "CREATE TABLE IF NOT EXISTS transactions (" +
                 "id INT PRIMARY KEY AUTO_INCREMENT, " +
-                "account_number INT NOT NULL, " +                    //befizető számlaszáma
+                "account_number INT NOT NULL, " +   //befizető számlaszáma
                 "name VARCHAR(50) NOT NULL, " +
                 "date DATE NOT NULL, " +
                 "time TIME NOT NULL, " +
@@ -59,31 +59,39 @@ public class TransactionRepository {
 
     public String createNewTransaction(String[] transactionData) {
         String infoBack = "Transaction save failed";
+
+        int accountNumber = Integer.parseInt(transactionData[0]);
+        java.sql.Date date = (java.sql.Date) dateFormatter(transactionData[2]);
+        java.sql.Time time = timeFormatter(transactionData[2]);
+        String transactionNumber = transactionData[5];
+
+        if (isNotDuplicate(accountNumber, date, time, transactionNumber)) {
+            infoBack = transactionCreateHelper(transactionData);
+        } else {
+            infoBack = "Transaction already saved";
+        }
+
+        return infoBack;
+    }
+
+    private String transactionCreateHelper(String[] transactionData) {
+
         String insertTransactionStatement = "INSERT INTO transactions " +
                 "(account_number, name, date, time, amount, description, transaction_number)" +
                 " VALUES (?,?,?,?,?,?,?)";
-
+        String infoBack ="Issue with insertion";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertTransactionStatement)) {
 
-            int accountNumber = Integer.parseInt(transactionData[0]);
-            java.sql.Date date = (java.sql.Date) dateFormatter(transactionData[2]);
-            java.sql.Time time = timeFormatter(transactionData[2]);
-            String transactionNumber = transactionData[5];
+            preparedStatement.setInt(1, Integer.parseInt(transactionData[0]));
+            preparedStatement.setString(2, transactionData[1]);
+            preparedStatement.setDate(3, (java.sql.Date) dateFormatter(transactionData[2]));
+            preparedStatement.setTime(4, timeFormatter(transactionData[2]));
+            preparedStatement.setInt(5, Integer.parseInt(transactionData[3]));
+            preparedStatement.setString(6, transactionData[4]);
+            preparedStatement.setString(7, transactionData[5]);
+            infoBack = "Transaction saved";
+            preparedStatement.executeUpdate();
 
-            if (isDuplicate(accountNumber, date, time, transactionNumber)) {
-
-                preparedStatement.setInt(1, accountNumber);
-                preparedStatement.setString(2, transactionData[1]);
-                preparedStatement.setDate(3, date);
-                preparedStatement.setTime(4, time);
-                preparedStatement.setInt(5, Integer.parseInt(transactionData[3]));
-                preparedStatement.setString(6, transactionData[4]);
-                preparedStatement.setString(7, transactionNumber);
-                infoBack = "Transaction saved";
-                preparedStatement.executeUpdate();
-            } else {
-                infoBack = "Transaction already saved";
-            }
         } catch (
                 SQLException throwables) {
             throwables.printStackTrace();
@@ -91,7 +99,7 @@ public class TransactionRepository {
         return infoBack;
     }
 
-    private boolean isDuplicate(int accountNumber, Date date, Time time, String transactionNumber) {
+    private boolean isNotDuplicate(int accountNumber, Date date, Time time, String transactionNumber) {
         String sqlCheck = "SELECT * FROM transactions WHERE account_number = ? AND date = ? AND time = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sqlCheck)) {
             preparedStatement.setInt(1, accountNumber);
