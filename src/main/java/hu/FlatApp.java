@@ -23,12 +23,9 @@ public class FlatApp {
 
         space = new Space(1,
                 6,
-                List.of(habitant),
+                List.of(habitant.getId()),
                 FlatType.FLAT_A,
-                block);
-
-        System.out.println(space);
-        String hehe = "hehe";
+                block.getId());
 
     }
 }

@@ -8,11 +8,11 @@ import java.sql.*;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
-public class AccountRepository {
+public class BlockRepository {
 
     Connection connection;
 
-    public AccountRepository() {
+    public BlockRepository() {
         try {
             this.connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
         } catch (SQLException throwables) {
@@ -20,18 +20,18 @@ public class AccountRepository {
         }
     }
 
-    public void createAccountTable() {
-        String sqlCreateTable = "CREATE TABLE IF NOT EXISTS account (" +
+    public void createBlockTable() {
+        String sqlCreateTable = "CREATE TABLE IF NOT EXISTS block (" +
                 "id INT NOT NULL AUTO_INCREMENT, " +
-                "name VARCHAR(50) NOT NULL, " +
-                "phone_number INT, " +
-                "email VARCHAR(50) NOT NULL, " +
-                "responsibility VARCHAR(50), " +
-                "cost INT, " +
-                "is_habitant BOOLEAN NOT NULL, " +
-                "occupation VARCHAR(30), " +
-                "age INT, " +
-                "company_name VARCHAR(30));";
+                "city VARCHAR(50) NOT NULL, " +
+                "postal_code INT, " +
+                "street VARCHAR(50) NOT NULL, " +
+                "house_number VARCHAR(50), " +
+                "description TEXT INT, " +
+                "number_of_spaces BOOLEAN NOT NULL, " +
+                "number_of_floors VARCHAR(30), " +
+                "number_of_spaces INT, " +
+                "number_of_accounts VARCHAR(30));";
         try (Statement statement = connection.createStatement()) {
             statement.execute(sqlCreateTable);
         } catch (SQLException throwables) {
@@ -102,4 +102,5 @@ public class AccountRepository {
         }
         return account;
     }
+
 }

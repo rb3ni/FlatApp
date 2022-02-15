@@ -12,25 +12,25 @@ public class Space {
     private int id;
     private int floor;
     private int door;
-    private List<Habitant> habitants;
+    private List<Integer> habitants;
     private FlatType flatType;
-    private Block block;
+    private Integer blockId;
 
-    public Space(int floor, int door, List<Habitant> habitants, FlatType flatType, Block block) {
+    public Space(int floor, int door, List<Integer> habitants, FlatType flatType, Integer block) {
         this.floor = floor;
         this.door = door;
         this.habitants = habitants;
         this.flatType = flatType;
-        this.block = block;
+        this.blockId = block;
     }
 
-    public Space(int id, int floor, int door, List<Habitant> habitants, FlatType flatType, Block block) {
+    public Space(int id, int floor, int door, List<Integer> habitants, FlatType flatType, Integer block) {
         this.id = id;
         this.floor = floor;
         this.door = door;
         this.habitants = habitants;
         this.flatType = flatType;
-        this.block = block;
+        this.blockId = block;
     }
 
     public int getId() {
@@ -57,11 +57,11 @@ public class Space {
         this.door = door;
     }
 
-    public List<Habitant> getHabitants() {
+    public List<Integer> getHabitants() {
         return habitants;
     }
 
-    public void setHabitants(List<Habitant> habitants) {
+    public void setHabitants(List<Integer> habitants) {
         this.habitants = habitants;
     }
 
@@ -73,12 +73,12 @@ public class Space {
         this.flatType = flatType;
     }
 
-    public Block getBlock() {
-        return block;
+    public Integer getBlockId() {
+        return blockId;
     }
 
-    public void setBlock(Block block) {
-        this.block = block;
+    public void setBlockId(Integer blockId) {
+        this.blockId = blockId;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class Space {
         return "Space{" +
                 "floor=" + floor +
                 ", door=" + door +
-                ", habitants=" + habitants.get(0).getName() +
+                ", habitants=" + habitants +
                 '}';
     }
 }
