@@ -4,6 +4,10 @@ import hu.domain.account.ExternalService;
 import hu.domain.account.Habitant;
 import hu.domain.space.Space;
 import hu.repository.AccountRepository;
+import hu.repository.TransactionRepository;
+
+import javax.swing.text.DateFormatter;
+import java.text.DateFormat;
 
 public class InitFlatApp {
     public static void main(String[] args) {
@@ -23,7 +27,7 @@ public class InitFlatApp {
                 32,
                 "CEO a Wayne vállalatnál");
 
-        externalService = new ExternalService(2,
+        externalService = new ExternalService(3,
                 "Pablo Escobar",
                 5554321,
                 "escobar@gmail.com",
@@ -33,8 +37,12 @@ public class InitFlatApp {
 
         //System.out.println(accountRepository.createNewAccount(habitant));
         //System.out.println(accountRepository.createNewAccount(externalService));
-        System.out.println(accountRepository.searchAccountById(1));
-        System.out.println(accountRepository.searchAccountById(2));
+        //System.out.println(accountRepository.searchAccountById(1));
+        //System.out.println(accountRepository.searchAccountById(2));
+
+        TransactionRepository transactionRepository = new TransactionRepository();
+        transactionRepository.createTransactionTable();
+        transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
 
     }
 
