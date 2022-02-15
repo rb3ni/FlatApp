@@ -100,19 +100,19 @@ public class Block {
         this.numberOfFloors = numberOfFloors;
     }
 
-    public List<Space> getSpaces() {
+    public List<Integer> getSpaces() {
         return spaces;
     }
 
-    public void setSpaces(List<Space> spaces) {
+    public void setSpaces(List<Integer> spaces) {
         this.spaces = spaces;
     }
 
-    public List<Account> getAccounts() {
+    public List<Integer> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<Account> accounts) {
+    public void setAccounts(List<Integer> accounts) {
         this.accounts = accounts;
     }
 
