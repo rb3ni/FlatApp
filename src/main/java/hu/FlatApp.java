@@ -27,8 +27,5 @@ public class FlatApp {
                 FlatType.FLAT_A,
                 block);
 
-        System.out.println(space);
-        String hehe = "hehe";
-
     }
 }
