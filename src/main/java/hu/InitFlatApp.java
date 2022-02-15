@@ -18,7 +18,7 @@ public class InitFlatApp {
         ExternalService externalService;
         Space space;
 
-        habitant = new Habitant(1,
+        habitant = new Habitant(
                 "Bruce Wayne",
                 5551234,
                 "bruce_wayne@gothamail.com",
@@ -27,7 +27,7 @@ public class InitFlatApp {
                 32,
                 "CEO a Wayne vállalatnál");
 
-        externalService = new ExternalService(3,
+        externalService = new ExternalService(
                 "Pablo Escobar",
                 5554321,
                 "escobar@gmail.com",
