@@ -1,38 +1,38 @@
 package hu.domain.event;
 
-import hu.domain.account.Account;
-import hu.domain.account.Habitant;
-
 import java.util.Date;
 import java.util.List;
 
 public class Emergency extends Event {
 
-    private Habitant habitant;
-    private List<Account> affectedFlats;
+    private Integer accountId;
+    private List<Integer> affectedSpaces;
 
-    public Emergency(String eventName, String description, Date date, Habitant habitant, List<Account> affectedFlats) {
-        super(eventName, description, date);
-        this.habitant = habitant;
-        this.affectedFlats = affectedFlats;
+    public Emergency(String eventName, String description, Date date, Date eventDate, Integer accountId, List<Integer> affectedSpaces) {
+        super(eventName, description, date, eventDate);
+        this.accountId = accountId;
+        this.affectedSpaces = affectedSpaces;
     }
 
-    public Emergency(int id, String eventName, String description, Date date, Habitant habitant, List<Account> affectedFlats) {
-        super(id, eventName, description, date);
-        this.habitant = habitant;
-        this.affectedFlats = affectedFlats;
+    public Emergency(int id, String eventName, String description, Date date, Date eventDate, Integer accountId, List<Integer> affectedSpaces) {
+        super(id, eventName, description, date, eventDate);
+        this.accountId = accountId;
+        this.affectedSpaces = affectedSpaces;
     }
 
-    public Emergency(String eventName, String description, Date date, List<Account> affectedFlats) {
-        super(eventName, description, date);
-        this.affectedFlats = affectedFlats;
+    public Integer getAccountId() {
+        return accountId;
     }
 
-    public Emergency(int id, String eventName, String description, Date date, List<Account> affectedFlats) {
-        super(id, eventName, description, date);
-        this.affectedFlats = affectedFlats;
+    public void setAccountId(Integer accountId) {
+        this.accountId = accountId;
     }
 
+    public List<Integer> getAffectedSpaces() {
+        return affectedSpaces;
+    }
 
-
+    public void setAffectedSpaces(List<Integer> affectedSpaces) {
+        this.affectedSpaces = affectedSpaces;
+    }
 }

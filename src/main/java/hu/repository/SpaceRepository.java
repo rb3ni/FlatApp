@@ -23,7 +23,7 @@ public class SpaceRepository {
 
     public void createSpaceTable() {
         String sqlCreateTable = "CREATE TABLE IF NOT EXISTS space (" +
-                "id INT NOT NULL AUTO_INCREMENT, " +
+                "id INT PRIMARY KEY, " +
                 "floor INT NOT NULL, " +
                 "door INT NOT NULL, " +
                 "number_of_rooms INT, " +
@@ -46,6 +46,7 @@ public class SpaceRepository {
         String insertAccountStatement = "INSERT INTO space VALUES (?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
 
+            preparedStatement.setInt(1, space.getId());
             preparedStatement.setInt(2, space.getFloor());
             preparedStatement.setInt(3, space.getDoor());
             preparedStatement.setDouble(4, space.getFlatType().getNumber_of_rooms());

@@ -8,18 +8,21 @@ public class Event {
     private String eventName;
     private String description;
     private Date date;
+    private Date eventDate;
 
-    public Event(String eventName, String description, Date date) {
+    public Event(String eventName, String description, Date date, Date eventDate) {
         this.eventName = eventName;
         this.description = description;
         this.date = date;
+        this.eventDate = eventDate;
     }
 
-    public Event(int id, String eventName, String description, Date date) {
+    public Event(int id, String eventName, String description, Date date, Date eventDate) {
         this.id = id;
         this.eventName = eventName;
         this.description = description;
         this.date = date;
+        this.eventDate = eventDate;
     }
 
     public int getId() {
@@ -52,5 +55,13 @@ public class Event {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public Date getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
     }
 }

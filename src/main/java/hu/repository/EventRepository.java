@@ -1,12 +1,10 @@
 package hu.repository;
 
+import hu.domain.event.Complain;
+import hu.domain.event.Emergency;
 import hu.domain.event.Event;
-import hu.domain.space.FlatType;
-import hu.domain.space.Space;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
@@ -24,10 +22,13 @@ public class EventRepository {
 
     public void createEventTable() {
         String sqlCreateTable = "CREATE TABLE IF NOT EXISTS event (" +
-                "id INT NOT NULL AUTO_INCREMENT, " +
+                "id INT PRIMARY KEY, " +
+                "sender INT, " +
                 "eventName VARCHAR(30) NOT NULL, " +
                 "description VARCHAR(255) NOT NULL, " +
-                "date DATE NOT NULL);";
+                "date DATE NOT NULL, " +
+                "event_date DATE NOT NULL, " +
+                "FOREIGN KEY (sender) REFERENCES account(id));";
         try (Statement statement = connection.createStatement()) {
             statement.execute(sqlCreateTable);
         } catch (SQLException throwables) {
@@ -36,16 +37,28 @@ public class EventRepository {
     }
 
     public String createNewEvent(Event event) {
-        String infoBack = "Space can not be created";
-        String insertAccountStatement = "INSERT INTO space VALUES (?,?,?,?,?,?,?,?,?,?)";
+        String infoBack = "Event can not be created";
+        String insertAccountStatement = "INSERT INTO space VALUES (?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
 
-            preparedStatement.setString(2, event.getEventName());
-            preparedStatement.setString(3, event.getDescription());
-            preparedStatement.setDate(4, (java.sql.Date) event.getDate());
+            preparedStatement.setInt(1, event.getId());
+            preparedStatement.setString(3, event.getEventName());
+            preparedStatement.setString(4, event.getDescription());
+            preparedStatement.setDate(5, (java.sql.Date) event.getDate());
+            preparedStatement.setDate(6, (java.sql.Date) event.getEventDate());
+
+            if (event instanceof Complain) {
+                preparedStatement.setInt(2, ((Complain) event).getAccountId());
+                // Majd az event_tableRepoból createEvent_table(event);
+
+            } else if (event instanceof Emergency) {
+                preparedStatement.setInt(2, ((Emergency) event).getAccountId());
+            } else {
+
+            }
 
             preparedStatement.executeUpdate();
-            infoBack = "Space created";
+            infoBack = "Event created";
         } catch (
                 SQLException throwables) {
             throwables.printStackTrace();
@@ -53,40 +66,33 @@ public class EventRepository {
         return infoBack;
     }
 
-    public Space searchSpaceById(int id) {
-        Space space = null;
-        String sql = "SELECT * FROM space s " +
-                "JOIN property_table pt ON pt.space_id = s.id " +
-                "WHERE s.id = ?;";
+    public Event searchEventById(int id) {
+        Event event = null;
+        String sql = "SELECT * FROM event e " +
+                "JOIN event_table et ON et.event_id = e.id " +
+                "WHERE e.id = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            int spaceFloor = resultSet.getInt("floor");
-            int spaceDoor = resultSet.getInt("door");
-            FlatType flatTypeOfSpace = FlatType.valueOf(resultSet.getString("space_type"));
-            Integer blockId = resultSet.getInt("block_id");
-            List<Integer> habitantIdList = getHabitantsId(resultSet);
+            String eventName = resultSet.getString("event_name");
+            String description = resultSet.getString("description");
+            Date date = resultSet.getDate("date");
+            Date eventDate = resultSet.getDate("event_date");
+            int hasSpaceId = resultSet.getInt("et.space_id");
+            int hasAccountId = resultSet.getInt("et.account_id");
 
-            return new Space(id, spaceFloor, spaceDoor, habitantIdList, flatTypeOfSpace, blockId);
+//            if (isComplain != 0) {
+//
+//
+//            }
+
+            return new Event(id, eventName, description, date, eventDate);
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
         return null;
     }
-
-    private List<Integer> getHabitantsId(ResultSet resultSet) {
-        List<Integer> idList = new ArrayList<>();
-        try {
-            while (resultSet.next()) {
-                idList.add(resultSet.getInt("pt.account_id"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return idList;
-    }
-
 }

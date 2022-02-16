@@ -1,41 +1,38 @@
 package hu.domain.event;
 
-import hu.domain.account.Account;
-import hu.domain.account.Habitant;
-
 import java.util.Date;
 import java.util.List;
 
 public class Complain extends Event {
 
-    private Habitant habitant;
-    private List<Account> recievers;
+    private Integer accountId;
+    private List<Integer> recievers;
 
-    public Complain(String eventName, String description, Date date, Habitant habitant, List<Account> recievers) {
-        super(eventName, description, date);
-        this.habitant = habitant;
+    public Complain(String eventName, String description, Date date, Date eventDate, Integer accountId, List<Integer> recievers) {
+        super(eventName, description, date, eventDate);
+        this.accountId = accountId;
         this.recievers = recievers;
     }
 
-    public Complain(int id, String eventName, String description, Date date, Habitant habitant, List<Account> recievers) {
-        super(id, eventName, description, date);
-        this.habitant = habitant;
+    public Complain(int id, String eventName, String description, Date date, Date eventDate, Integer accountId, List<Integer> recievers) {
+        super(id, eventName, description, date, eventDate);
+        this.accountId = accountId;
         this.recievers = recievers;
     }
 
-    public Habitant getHabitant() {
-        return habitant;
+    public Integer getAccountId() {
+        return accountId;
     }
 
-    public void setHabitant(Habitant habitant) {
-        this.habitant = habitant;
+    public void setAccountId(Integer accountId) {
+        this.accountId = accountId;
     }
 
-    public List<Account> getRecievers() {
+    public List<Integer> getRecievers() {
         return recievers;
     }
 
-    public void setRecievers(List<Account> recievers) {
+    public void setRecievers(List<Integer> recievers) {
         this.recievers = recievers;
     }
 }

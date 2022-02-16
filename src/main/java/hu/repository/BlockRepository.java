@@ -25,7 +25,7 @@ public class BlockRepository {
 
     public void createBlockTable() {
         String sqlCreateTable = "CREATE TABLE IF NOT EXISTS block (" +
-                "id INT NOT NULL AUTO_INCREMENT, " +
+                "id INT PRIMARY KEY, " +
                 "city VARCHAR(50) NOT NULL, " +
                 "postal_code INT NOT NULL, " +
                 "street VARCHAR(50) NOT NULL, " +
@@ -46,6 +46,7 @@ public class BlockRepository {
         String insertAccountStatement = "INSERT INTO account VALUES (?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
 
+            preparedStatement.setInt(1, block.getId());
             preparedStatement.setString(2, block.getCity());
             preparedStatement.setInt(3, block.getPostalCode());
             preparedStatement.setString(4, block.getStreet());
@@ -75,7 +76,6 @@ public class BlockRepository {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            int blockId = id;
             String city = resultSet.getString("city");
             int postalCode = resultSet.getInt("postal_code");
             String street = resultSet.getString("street");
@@ -87,7 +87,7 @@ public class BlockRepository {
             List<Integer> spaces = spaceIdList(resultSet);
             List<Integer> accounts = getAccountsId(resultSet);
 
-            return new Block(blockId, city, postalCode, street, houseNumber, description, numberOfSpaces,
+            return new Block(id, city, postalCode, street, houseNumber, description, numberOfSpaces,
                     numberOfFloors, spaces, accounts, paymentDeadLine);
 
 
