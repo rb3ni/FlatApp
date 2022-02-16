@@ -1,10 +1,13 @@
 package hu.repository;
 
+import hu.domain.Block;
 import hu.domain.account.Account;
 import hu.domain.account.ExternalService;
 import hu.domain.account.Habitant;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
@@ -24,14 +27,13 @@ public class BlockRepository {
         String sqlCreateTable = "CREATE TABLE IF NOT EXISTS block (" +
                 "id INT NOT NULL AUTO_INCREMENT, " +
                 "city VARCHAR(50) NOT NULL, " +
-                "postal_code INT, " +
+                "postal_code INT NOT NULL, " +
                 "street VARCHAR(50) NOT NULL, " +
-                "house_number VARCHAR(50), " +
-                "description TEXT INT, " +
-                "number_of_spaces BOOLEAN NOT NULL, " +
-                "number_of_floors VARCHAR(30), " +
-                "number_of_spaces INT, " +
-                "number_of_accounts VARCHAR(30));";
+                "house_number VARCHAR(20) NOT NULL, " +
+                "description TEXT, " +
+                "number_of_spaces INT NOT NULL, " +
+                "number_of_floors INT NOT NULL, " +
+                "payment_deadline Date NOT NULL);";
         try (Statement statement = connection.createStatement()) {
             statement.execute(sqlCreateTable);
         } catch (SQLException throwables) {
@@ -39,30 +41,22 @@ public class BlockRepository {
         }
     }
 
-    public String createNewAccount(Account account) {
-        String infoBack = "Account can not be created";
-        String insertAccountStatement = "INSERT INTO account VALUES (?,?,?,?,?,?,?,?,?,?)";
+    public String createNewBlock(Block block) {
+        String infoBack = "Block can not be created";
+        String insertAccountStatement = "INSERT INTO account VALUES (?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
 
-            preparedStatement.setString(2, account.getName());
-            preparedStatement.setInt(3, account.getPhoneNumber());
-            preparedStatement.setString(4, account.getEmail());
-            preparedStatement.setString(5, account.getResponsibility());
-            preparedStatement.setInt(6, account.getCost());
+            preparedStatement.setString(2, block.getCity());
+            preparedStatement.setInt(3, block.getPostalCode());
+            preparedStatement.setString(4, block.getStreet());
+            preparedStatement.setInt(5, block.getHouseNumber());
+            preparedStatement.setString(6, block.getDescription());
+            preparedStatement.setInt(7, block.getNumberOfFlats());
+            preparedStatement.setInt(8, block.getNumberOfFloors());
+            preparedStatement.setDate(9, (java.sql.Date) block.getPaymentDeadline());
 
-            if (account instanceof Habitant) {
-                preparedStatement.setBoolean(7, true);
-                preparedStatement.setString(8, ((Habitant) account).getOccupation());
-                preparedStatement.setInt(9, ((Habitant) account).getAge());
-                preparedStatement.setString(10, null);
-            } else {
-                preparedStatement.setBoolean(7, false);
-                preparedStatement.setString(8, null);
-                preparedStatement.setInt(9, -1);
-                preparedStatement.setString(10, ((ExternalService) account).getCompanyName());
-            }
             preparedStatement.executeUpdate();
-            infoBack = "Account created";
+            infoBack = "Block created";
         } catch (
                 SQLException throwables) {
             throwables.printStackTrace();
@@ -70,37 +64,60 @@ public class BlockRepository {
         return infoBack;
     }
 
-    public Account searchAccountById(int id) {
-        Account account = null;
-        String sql = "SELECT * FROM account a\n" +
-                "WHERE a.id = ?;";
+    public Block searchBlockById(int id) {
+        Block block = null;
+        String sql = "SELECT * FROM block b " +
+                "JOIN space s ON s.block_id=b.id " +
+                "JOIN property_table pt ON s.id= pt.space_id " +
+                "WHERE b.id = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            while (resultSet.next()) {
-                if (resultSet.getBoolean("is_habitant")) {
-                    account = new Habitant(resultSet.getString("name"),
-                            resultSet.getInt("phone_number"),
-                            resultSet.getString("email"),
-                            resultSet.getString("responsibility"),
-                            resultSet.getInt("cost"),
-                            resultSet.getInt("age"),
-                            resultSet.getString("occupation"));
-                } else {
-                    account = new ExternalService(resultSet.getString("name"),
-                            resultSet.getInt("phone_number"),
-                            resultSet.getString("email"),
-                            resultSet.getString("responsibility"),
-                            resultSet.getInt("cost"),
-                            resultSet.getString("company_name"));
-                }
-            }
+            int blockId = id;
+            String city = resultSet.getString("city");
+            int postalCode = resultSet.getInt("postal_code");
+            String street = resultSet.getString("street");
+            int houseNumber = resultSet.getInt("house_number");
+            String description = resultSet.getString("description");
+            int numberOfSpaces = resultSet.getInt("number_of_spaces");
+            int numberOfFloors = resultSet.getInt("number_of_floors");
+            Date paymentDeadLine = resultSet.getDate("payment_deadline");
+            List<Integer> spaces = spaceIdList(resultSet);
+            List<Integer> accounts = getAccountsId(resultSet);
+
+            return new Block(blockId, city, postalCode, street, houseNumber, description, numberOfSpaces,
+                    numberOfFloors, spaces, accounts, paymentDeadLine);
+
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return account;
+        return block;
     }
 
+    private List<Integer> spaceIdList(ResultSet resultSet) {
+        List<Integer> spaceIdList = new ArrayList<>();
+        try {
+            while (resultSet.next()) {
+                spaceIdList.add(resultSet.getInt("s.id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return spaceIdList;
+    }
+
+    private List<Integer> getAccountsId(ResultSet resultSet) {
+        List<Integer> idList = new ArrayList<>();
+        try {
+            while (resultSet.next()) {
+                idList.add(resultSet.getInt("pt.account_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return idList;
+    }
 }
