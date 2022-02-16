@@ -8,7 +8,6 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.OptionalInt;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
