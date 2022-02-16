@@ -5,6 +5,8 @@ import hu.domain.account.ExternalService;
 import hu.domain.account.Habitant;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
@@ -60,7 +62,7 @@ public class AccountRepository {
             } else {
                 preparedStatement.setBoolean(7, false);
                 preparedStatement.setString(8, null);
-                preparedStatement.setInt(9, -1);
+                preparedStatement.setNull(9,Types.INTEGER);
                 preparedStatement.setString(10, ((ExternalService) account).getCompanyName());
             }
             preparedStatement.executeUpdate();
@@ -76,8 +78,8 @@ public class AccountRepository {
         Random random = new Random();
         int id = 100000 + random.nextInt(899999);
 
-        if (searchAccountById(id) != null){
-            while (searchAccountById(id) != null){
+        if (searchAccountById(id) != null) {
+            while (searchAccountById(id) != null) {
                 id = 100000 + random.nextInt(899999);
             }
         }
@@ -120,4 +122,38 @@ public class AccountRepository {
         }
         return account;
     }
+
+    public List<Integer> accountIdList() {
+        List<Integer> idList = new ArrayList<>();
+        String sql = "SELECT * FROM account";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                idList.add(resultSet.getInt("id"));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return idList;
+    }
+
+    public void overwriteAccountIdByName(String name, int newId){
+        String infoBack = "overwrite failed!";
+
+        String overwriteStatement = "UPDATE account " +
+                "SET id = ? WHERE name = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(overwriteStatement)) {
+            preparedStatement.setInt(1, newId);
+            preparedStatement.setString(2, name);
+            preparedStatement.executeUpdate();
+            infoBack = "id overwrited to: " + newId;
+        } catch (
+                SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
 }

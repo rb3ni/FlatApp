@@ -6,13 +6,12 @@ import hu.domain.space.Space;
 import hu.repository.AccountRepository;
 import hu.repository.TransactionRepository;
 
-import javax.swing.text.DateFormatter;
-import java.text.DateFormat;
-
 public class InitFlatApp {
     public static void main(String[] args) {
-    AccountRepository accountRepository = new AccountRepository();
-    accountRepository.createAccountTable();
+        TransactionRepository transactionRepository = new TransactionRepository();
+        AccountRepository accountRepository = new AccountRepository();
+        accountRepository.createAccountTable();
+        transactionRepository.createTransactionTable();
 
         Habitant habitant;
         ExternalService externalService;
@@ -39,10 +38,14 @@ public class InitFlatApp {
         //System.out.println(accountRepository.createNewAccount(externalService));
         //System.out.println(accountRepository.searchAccountById(1));
         //System.out.println(accountRepository.searchAccountById(2));
+        System.out.println(accountRepository.accountIdList());
+        //accountRepository.overwriteAccountIdByName("Bruce Wayne",111111);
 
-        TransactionRepository transactionRepository = new TransactionRepository();
-        transactionRepository.createTransactionTable();
+
+
         transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
+
+
 
     }
 
