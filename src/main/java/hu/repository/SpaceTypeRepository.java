@@ -20,7 +20,7 @@ public class SpaceTypeRepository {
 
 
     public void createSpaceTypeRepository() {
-        String sqlCreateTable = "CREATE TABLE IF NOT EXISTS space_type_repository (" +
+        String sqlCreateTable = "CREATE TABLE IF NOT EXISTS space_type (" +
                 "space_type VARCHAR(30) PRIMARY KEY, " +
                 "number_of_rooms INT, " +
                 "area INT NOT NULL, " +
@@ -39,7 +39,7 @@ public class SpaceTypeRepository {
 
     public String createNewSpaceType(SpaceType spaceType) {
         String infoBack = "Space-type can not be created";
-        String insertSpaceTypeStatement = "INSERT INTO space_type_repository VALUES (?,?,?,?,?,?,?)";
+        String insertSpaceTypeStatement = "INSERT INTO space_type VALUES (?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertSpaceTypeStatement)) {
 
 

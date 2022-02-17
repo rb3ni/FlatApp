@@ -57,7 +57,7 @@ public class SpaceRepositoryMod {
     public List<SpaceMod> searchSpacesById(int id) {
         List<SpaceMod> spaceMods = null;
         String sql = "SELECT * FROM space s " +
-                "JOIN space_type_repository str ON stp.space_type = s.space_type " +
+                "JOIN space_type str ON str.space_type = s.space_type " +
                 "WHERE s.id = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -78,5 +78,31 @@ public class SpaceRepositoryMod {
         }
         return null;
     }
+
+//    public List<SpaceMod> searchSpacesByFloorAndDoor(int floor, int door) {
+//        List<SpaceMod> spaceMods = null;
+//        String sql = "SELECT * FROM space s " +
+//                "JOIN space_type str ON str.space_type = s.space_type " +
+//                "WHERE s.floor = ?" +
+//                "s.door = ?;";
+//
+//        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+//            preparedStatement.setInt(1, id);
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//
+//            int spaceFloor = resultSet.getInt("floor");
+//            int spaceDoor = resultSet.getInt("door");
+//            String spaceType = resultSet.getString("space_type");
+//            Integer blockId = resultSet.getInt("block_id");
+//
+//            while (resultSet.next()) {
+//                spaceMods.add(new SpaceMod(id, spaceFloor, spaceDoor, null, spaceType, blockId));
+//            }
+//
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
+//        return null;
+//    }
 
 }

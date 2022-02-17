@@ -123,6 +123,43 @@ public class AccountRepository {
         return account;
     }
 
+    public Account searchAccountByEmail(String email) {
+        Account account = null;
+        String sql = "SELECT * FROM account a\n" +
+                "WHERE a.email LIKE ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                if (resultSet.getBoolean("is_habitant")) {
+                    account = new Habitant(
+                            resultSet.getInt("id"),
+                            resultSet.getString("name"),
+                            resultSet.getInt("phone_number"),
+                            resultSet.getString("email"),
+                            resultSet.getString("responsibility"),
+                            resultSet.getInt("cost"),
+                            resultSet.getInt("age"),
+                            resultSet.getString("occupation"));
+                } else {
+                    account = new ExternalService(
+                            resultSet.getInt("id"),
+                            resultSet.getString("name"),
+                            resultSet.getInt("phone_number"),
+                            resultSet.getString("email"),
+                            resultSet.getString("responsibility"),
+                            resultSet.getInt("cost"),
+                            resultSet.getString("company_name"));
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return account;
+    }
+
     public List<Integer> accountIdList() {
         List<Integer> idList = new ArrayList<>();
         String sql = "SELECT * FROM account";
