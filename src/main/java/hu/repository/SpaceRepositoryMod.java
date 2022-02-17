@@ -54,10 +54,9 @@ public class SpaceRepositoryMod {
         return infoBack;
     }
 
-    public List<SpaceMod> searchSpacesById(int id) {
-        List<SpaceMod> spaceMods = null;
+    public SpaceMod searchSpacesById(int id) {
+        SpaceMod spaceMods = null;
         String sql = "SELECT * FROM space s " +
-                "JOIN space_type str ON str.space_type = s.space_type " +
                 "WHERE s.id = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -70,7 +69,7 @@ public class SpaceRepositoryMod {
             Integer blockId = resultSet.getInt("block_id");
 
             while (resultSet.next()) {
-                spaceMods.add(new SpaceMod(id, spaceFloor, spaceDoor, null, spaceType, blockId));
+                spaceMods = new SpaceMod(id, spaceFloor, spaceDoor, null, spaceType, blockId);
             }
 
         } catch (SQLException throwables) {
@@ -79,30 +78,34 @@ public class SpaceRepositoryMod {
         return null;
     }
 
-//    public List<SpaceMod> searchSpacesByFloorAndDoor(int floor, int door) {
-//        List<SpaceMod> spaceMods = null;
-//        String sql = "SELECT * FROM space s " +
-//                "JOIN space_type str ON str.space_type = s.space_type " +
-//                "WHERE s.floor = ?" +
-//                "s.door = ?;";
-//
-//        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-//            preparedStatement.setInt(1, id);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//
-//            int spaceFloor = resultSet.getInt("floor");
-//            int spaceDoor = resultSet.getInt("door");
-//            String spaceType = resultSet.getString("space_type");
-//            Integer blockId = resultSet.getInt("block_id");
-//
-//            while (resultSet.next()) {
-//                spaceMods.add(new SpaceMod(id, spaceFloor, spaceDoor, null, spaceType, blockId));
-//            }
-//
-//        } catch (SQLException throwables) {
-//            throwables.printStackTrace();
-//        }
-//        return null;
-//    }
+    public SpaceMod searchSpacesByFloorAndDoor(int floor, int door) {
+        SpaceMod spaceMods = null;
+        String sql = "SELECT * FROM space s " +
+                "WHERE s.floor = ? AND s.door = ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, floor);
+            preparedStatement.setInt(2, door);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            int spaceId = resultSet.getInt("id");
+            int spaceFloor = resultSet.getInt("floor");
+            int spaceDoor = resultSet.getInt("door");
+            String spaceType = resultSet.getString("space_type");
+            Integer blockId = resultSet.getInt("block_id");
+
+            while (resultSet.next()) {
+                spaceMods = new SpaceMod(spaceId, spaceFloor, spaceDoor, null, spaceType, blockId);
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
 
 }
