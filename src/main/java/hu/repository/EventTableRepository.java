@@ -6,6 +6,7 @@ import hu.domain.event.Emergency;
 import hu.domain.event.Event;
 import hu.domain.event.Reminder;
 import hu.domain.space.Space;
+import hu.domain.space.SpaceMod;
 
 import java.sql.*;
 
@@ -51,13 +52,13 @@ public class EventTableRepository {
                     preparedStatement.addBatch();
                 }
             } else if (event instanceof Emergency) {
-                for (Space space : ((Emergency) event).getAffectedSpaces()) {
+                for (SpaceMod space : ((Emergency) event).getAffectedSpaces()) {
                     preparedStatement.setInt(4, event.getId());
                     preparedStatement.setInt(3, space.getId());
                     preparedStatement.addBatch();
                 }
             } else {
-                for (Space space : ((Reminder) event).getAffectedSpaces()) {
+                for (SpaceMod space : ((Reminder) event).getAffectedSpaces()) {
                     preparedStatement.setInt(4, event.getId());
                     preparedStatement.setInt(3, space.getId());
                     preparedStatement.addBatch();

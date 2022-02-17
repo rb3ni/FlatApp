@@ -6,6 +6,7 @@ import hu.domain.event.Emergency;
 import hu.domain.event.Event;
 import hu.domain.event.Reminder;
 import hu.domain.space.Space;
+import hu.domain.space.SpaceMod;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,14 +19,14 @@ public class EventRepository {
     Connection connection;
     EventTableRepository eventTableRepository;
     AccountRepository accountRepository;
-    SpaceRepository spaceRepository;
+    SpaceRepositoryMod spaceRepositoryMod;
 
     public EventRepository() {
         try {
             this.connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
             this.eventTableRepository = new EventTableRepository();
             this.accountRepository = new AccountRepository();
-            this.spaceRepository = new SpaceRepository();
+            this.spaceRepositoryMod = new SpaceRepositoryMod();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -87,11 +88,11 @@ public class EventRepository {
             Date date = resultSet.getDate("date");
             Date eventDate = resultSet.getDate("event_date");
             List<Account> accountList = new ArrayList<>();
-            List<Space> spaceList = new ArrayList<>();
+            List<SpaceMod> spaceList = new ArrayList<>();
 
             if (resultSet.getInt("et.account_id") == 0 && resultSet.getInt("sender") == 0) {
                 do {
-                    Space space = spaceRepository.searchSpaceById(resultSet.getInt("et_space_id"));
+                    SpaceMod space = spaceRepositoryMod.searchSpacesById(resultSet.getInt("et_space_id"));
                     spaceList.add(space);
                     return new Reminder(resultSet.getInt("id"), eventName, description, date, eventDate,
                             spaceList);
@@ -105,7 +106,7 @@ public class EventRepository {
                 } while (resultSet.next());
             } else if (resultSet.getInt("et.account_id") == 0 && resultSet.getInt("sender") != 0) {
                 do {
-                    Space space = spaceRepository.searchSpaceById(resultSet.getInt("et_space_id"));
+                    SpaceMod space = spaceRepositoryMod.searchSpacesById(resultSet.getInt("et_space_id"));
                     spaceList.add(space);
                     return new Emergency(resultSet.getInt("id"), eventName, description, date, eventDate,
                             sender, spaceList);
