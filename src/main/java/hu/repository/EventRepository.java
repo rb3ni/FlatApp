@@ -1,20 +1,31 @@
 package hu.repository;
 
+import hu.domain.account.Account;
 import hu.domain.event.Complain;
 import hu.domain.event.Emergency;
 import hu.domain.event.Event;
+import hu.domain.event.Reminder;
+import hu.domain.space.Space;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
 public class EventRepository {
 
     Connection connection;
+    EventTableRepository eventTableRepository;
+    AccountRepository accountRepository;
+    SpaceRepository spaceRepository;
 
     public EventRepository() {
         try {
             this.connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+            this.eventTableRepository = new EventTableRepository();
+            this.accountRepository = new AccountRepository();
+            this.spaceRepository = new SpaceRepository();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -38,26 +49,20 @@ public class EventRepository {
 
     public String createNewEvent(Event event) {
         String infoBack = "Event can not be created";
-        String insertAccountStatement = "INSERT INTO space VALUES (?,?,?,?,?,?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
+        String insertEventStatement = "INSERT INTO event VALUES (?,?,?,?,?,?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertEventStatement)) {
 
             preparedStatement.setInt(1, event.getId());
+            if (!(event instanceof Reminder)) {
+                preparedStatement.setInt(2, ((Complain) event).getAccount().getId());
+            }
             preparedStatement.setString(3, event.getEventName());
             preparedStatement.setString(4, event.getDescription());
             preparedStatement.setDate(5, (java.sql.Date) event.getDate());
             preparedStatement.setDate(6, (java.sql.Date) event.getEventDate());
 
-            if (event instanceof Complain) {
-                preparedStatement.setInt(2, ((Complain) event).getAccountId());
-                // Majd az event_tableRepoból createEvent_table(event);
-
-            } else if (event instanceof Emergency) {
-                preparedStatement.setInt(2, ((Emergency) event).getAccountId());
-            } else {
-
-            }
-
             preparedStatement.executeUpdate();
+            eventTableRepository.createNewEventConnectionTable(event);
             infoBack = "Event created";
         } catch (
                 SQLException throwables) {
@@ -77,17 +82,35 @@ public class EventRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             String eventName = resultSet.getString("event_name");
+            Account sender = accountRepository.searchAccountById(resultSet.getInt("sender"));
             String description = resultSet.getString("description");
             Date date = resultSet.getDate("date");
             Date eventDate = resultSet.getDate("event_date");
-            int hasSpaceId = resultSet.getInt("et.space_id");
-            int hasAccountId = resultSet.getInt("et.account_id");
+            List<Account> accountList = new ArrayList<>();
+            List<Space> spaceList = new ArrayList<>();
 
-//            if (isComplain != 0) {
-//
-//
-//            }
-
+            if (resultSet.getInt("et.account_id") == 0 && resultSet.getInt("sender") == 0) {
+                do {
+                    Space space = spaceRepository.searchSpaceById(resultSet.getInt("et_space_id"));
+                    spaceList.add(space);
+                    return new Reminder(resultSet.getInt("id"), eventName, description, date, eventDate,
+                            spaceList);
+                } while (resultSet.next());
+            } else if (resultSet.getInt("et.space_id") == 0) {
+                do {
+                    Account account = accountRepository.searchAccountById(resultSet.getInt("et.account_id"));
+                    accountList.add(account);
+                    return new Complain(resultSet.getInt("id"), eventName, description, date,
+                            eventDate, sender, accountList);
+                } while (resultSet.next());
+            } else if (resultSet.getInt("et.account_id") == 0 && resultSet.getInt("sender") != 0) {
+                do {
+                    Space space = spaceRepository.searchSpaceById(resultSet.getInt("et_space_id"));
+                    spaceList.add(space);
+                    return new Emergency(resultSet.getInt("id"), eventName, description, date, eventDate,
+                            sender, spaceList);
+                } while (resultSet.next());
+            }
             return new Event(id, eventName, description, date, eventDate);
 
         } catch (SQLException throwables) {
