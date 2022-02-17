@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
@@ -45,6 +46,8 @@ public class TransactionRepository {
     }
 
     public void readTransactions(String path) {
+        List<Integer> unassertedTransactionIds = new ArrayList<>();
+
         Path transactionPath = Path.of(path);
         try (BufferedReader bufferedReader = Files.newBufferedReader(transactionPath)) {
             String line;
@@ -62,15 +65,15 @@ public class TransactionRepository {
     }
 
     public String createNewTransaction(String[] transactionData) {
-        String infoBack = "Transaction save failed";
-
+        String infoBack = "Issue with creating new transaction";
         int accountNumber = Integer.parseInt(transactionData[0]);
         Date date = (java.sql.Date) dateFormatter(transactionData[2]);
         Time time = timeFormatter(transactionData[2]);
         String transactionNumber = transactionData[5];
 
         if (isNotDuplicate(transactionNumber)) {
-            infoBack = transactionCreateHelper(transactionData);
+            System.out.println(transactionCreateHelper(transactionData));
+            infoBack = "Transaction saved";
         } else {
             infoBack = "Transaction already saved";
         }
@@ -95,11 +98,11 @@ public class TransactionRepository {
             preparedStatement.setString(7, transactionData[5]);
             if (assignAccount(transactionData[4]) != null) {
                 preparedStatement.setInt(8, assignAccount(transactionData[4]));
-            }else {
-                preparedStatement.setNull(8,Types.INTEGER);
+            } else {
+                preparedStatement.setNull(8, Types.INTEGER);
             }
 
-            infoBack = "Transaction saved";
+            infoBack = "Transaction created";
             preparedStatement.executeUpdate();
 
         } catch (
@@ -156,4 +159,47 @@ public class TransactionRepository {
         return accountIdFound;
     }
 
+    public List<String> unassignedTransactions() {
+
+        List<String> transactionNumbers = new ArrayList<>();
+        String sql = "SELECT * FROM transactions";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                if (resultSet.getString("account_id") == null) {
+                    transactionNumbers.add(
+                            resultSet.getString("transaction_number"));
+                }
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return transactionNumbers;
+    }
+
+    public Date getDeadline() {
+        Date date = null;
+        String sql = "SELECT * FROM block WHERE id = ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, 1);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                date = resultSet.getDate("payment_deadline");
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return date;
+    }
+
+// TODO public assignAccountManuallyByTransactionNumber
+
 }
+
+

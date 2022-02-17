@@ -42,7 +42,6 @@ public class SpaceTypeRepository {
         String insertSpaceTypeStatement = "INSERT INTO space_type VALUES (?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertSpaceTypeStatement)) {
 
-
             preparedStatement.setString(1, spaceType.getSpaceType());
             preparedStatement.setDouble(2, spaceType.getNumberOfRooms());
             preparedStatement.setInt(3, spaceType.getArea());

@@ -1,9 +1,9 @@
 package hu;
 
 import hu.domain.Block;
-import hu.domain.space.FlatType;
 import hu.domain.account.Habitant;
 import hu.domain.space.Space;
+import hu.domain.space.SpaceType;
 
 import java.util.List;
 
@@ -21,11 +21,6 @@ public class FlatApp {
                 32,
                 "CEO a Wayne vállalatnál");
 
-        space = new Space(1,
-                6,
-                List.of(habitant.getId()),
-                FlatType.FLAT_A,
-                block.getId());
 
     }
 }

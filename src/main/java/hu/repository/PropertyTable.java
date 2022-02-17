@@ -1,6 +1,10 @@
 package hu.repository;
 
+import hu.domain.space.Space;
+
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
@@ -43,7 +47,7 @@ public class PropertyTable {
                 preparedStatement.setInt(1, spaceId);
                 preparedStatement.setInt(2, habitantId);
                 preparedStatement.executeUpdate();
-                infoBack = "Transaction saved";
+                infoBack = "Assertion saved";
 
             } catch (
                     SQLException throwables) {
@@ -51,6 +55,32 @@ public class PropertyTable {
             }
         }
         return infoBack;
+    }
+
+
+    public List<Space> searchSpacesByHabitantId(int id) {
+        List<Space> spaces = new ArrayList<>();
+        String sql = "SELECT * FROM property_table pt " +
+                "JOIN space s ON s.id = pt.space_id " +
+                "WHERE pt.account_id = ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+            int spaceFloor = resultSet.getInt("floor");
+            int spaceDoor = resultSet.getInt("door");
+            String spaceType = resultSet.getString("space_type");
+            int balance = resultSet.getInt("balance");
+
+                spaces.add(new Space(id, spaceFloor, spaceDoor,null, spaceType, 1, balance));
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return spaces;
     }
 
     private boolean isNotDuplicate(int habitantId, int spaceId) {

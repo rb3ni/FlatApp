@@ -33,7 +33,9 @@ public class BlockRepository {
                 "description TEXT, " +
                 "number_of_spaces INT NOT NULL, " +
                 "number_of_floors INT NOT NULL, " +
-                "payment_deadline Date NOT NULL);";
+                "payment_deadline Date NOT NULL, " +
+                "starting_date Date NOT NULL" +
+                ");";
         try (Statement statement = connection.createStatement()) {
             statement.execute(sqlCreateTable);
         } catch (SQLException throwables) {
@@ -43,7 +45,7 @@ public class BlockRepository {
 
     public String createNewBlock(Block block) {
         String infoBack = "Block can not be created";
-        String insertAccountStatement = "INSERT INTO account VALUES (?,?,?,?,?,?,?,?,?)";
+        String insertAccountStatement = "INSERT INTO block VALUES (?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
 
             preparedStatement.setInt(1, block.getId());
@@ -55,6 +57,10 @@ public class BlockRepository {
             preparedStatement.setInt(7, block.getNumberOfFlats());
             preparedStatement.setInt(8, block.getNumberOfFloors());
             preparedStatement.setDate(9, (java.sql.Date) block.getPaymentDeadline());
+            preparedStatement.setDate(10, (java.sql.Date) block.getStartingDate());
+
+
+
 
             preparedStatement.executeUpdate();
             infoBack = "Block created";
@@ -84,11 +90,12 @@ public class BlockRepository {
             int numberOfSpaces = resultSet.getInt("number_of_spaces");
             int numberOfFloors = resultSet.getInt("number_of_floors");
             Date paymentDeadLine = resultSet.getDate("payment_deadline");
+            Date startingDate = resultSet.getDate("payment_deadline");
             List<Integer> spaces = spaceIdList(resultSet);
             List<Integer> accounts = getAccountsId(resultSet);
 
             return new Block(id, city, postalCode, street, houseNumber, description, numberOfSpaces,
-                    numberOfFloors, spaces, accounts, paymentDeadLine);
+                    numberOfFloors, spaces, accounts, paymentDeadLine, startingDate);
 
 
         } catch (SQLException throwables) {

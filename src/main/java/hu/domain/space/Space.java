@@ -1,10 +1,6 @@
 package hu.domain.space;
 
 
-import hu.domain.Block;
-import hu.domain.account.Habitant;
-import hu.domain.space.FlatType;
-
 import java.util.List;
 
 public class Space {
@@ -13,24 +9,27 @@ public class Space {
     private int floor;
     private int door;
     private List<Integer> habitants;
-    private FlatType flatType;
+    private String spaceType;
     private Integer blockId;
+    private int balance;
 
-    public Space(int floor, int door, List<Integer> habitants, FlatType flatType, Integer block) {
+    public Space(int floor, int door, List<Integer> habitants, String spaceType, Integer blockId, int balance) {
         this.floor = floor;
         this.door = door;
         this.habitants = habitants;
-        this.flatType = flatType;
-        this.blockId = block;
+        this.spaceType = spaceType;
+        this.blockId = blockId;
+        this.balance = balance;
     }
 
-    public Space(int id, int floor, int door, List<Integer> habitants, FlatType flatType, Integer block) {
+    public Space(int id, int floor, int door, List<Integer> habitants, String spaceType, Integer blockId, int balance) {
         this.id = id;
         this.floor = floor;
         this.door = door;
         this.habitants = habitants;
-        this.flatType = flatType;
-        this.blockId = block;
+        this.spaceType = spaceType;
+        this.blockId = blockId;
+        this.balance = balance;
     }
 
     public int getId() {
@@ -65,12 +64,12 @@ public class Space {
         this.habitants = habitants;
     }
 
-    public FlatType getFlatType() {
-        return flatType;
+    public String getSpaceType() {
+        return spaceType;
     }
 
-    public void setFlatType(FlatType flatType) {
-        this.flatType = flatType;
+    public void setSpaceType(String spaceType) {
+        this.spaceType = spaceType;
     }
 
     public Integer getBlockId() {
@@ -79,6 +78,14 @@ public class Space {
 
     public void setBlockId(Integer blockId) {
         this.blockId = blockId;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setBalance(int balance) {
+        this.balance = balance;
     }
 
     @Override
