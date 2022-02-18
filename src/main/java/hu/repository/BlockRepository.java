@@ -22,7 +22,7 @@ public class BlockRepository {
 
     public void createBlockTable() {
         String sqlCreateTable = "CREATE TABLE IF NOT EXISTS block (" +
-                "id INT PRIMARY KEY, " +
+                "id INT PRIMARY KEY AUTO_INCREMENT, " +
                 "city VARCHAR(50) NOT NULL, " +
                 "postal_code INT NOT NULL, " +
                 "street VARCHAR(50) NOT NULL, " +
@@ -42,19 +42,21 @@ public class BlockRepository {
 
     public String createNewBlock(Block block) {
         String infoBack = "Block can not be created";
-        String insertAccountStatement = "INSERT INTO block VALUES (?,?,?,?,?,?,?,?,?,?)";
+        String insertAccountStatement = "INSERT INTO block" +
+                "(city, postal_code, street, house_number, description, number_of_spaces, number_of_floors, " +
+                "payment_deadline, starting_date) " +
+                "VALUES (?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
 
-            preparedStatement.setInt(1, block.getId());
-            preparedStatement.setString(2, block.getCity());
-            preparedStatement.setInt(3, block.getPostalCode());
-            preparedStatement.setString(4, block.getStreet());
-            preparedStatement.setInt(5, block.getHouseNumber());
-            preparedStatement.setString(6, block.getDescription());
-            preparedStatement.setInt(7, block.getNumberOfFlats());
-            preparedStatement.setInt(8, block.getNumberOfFloors());
-            preparedStatement.setDate(9, (java.sql.Date) block.getPaymentDeadline());
-            preparedStatement.setDate(10, (java.sql.Date) block.getStartingDate());
+            preparedStatement.setString(1, block.getCity());
+            preparedStatement.setInt(2, block.getPostalCode());
+            preparedStatement.setString(3, block.getStreet());
+            preparedStatement.setInt(4, block.getHouseNumber());
+            preparedStatement.setString(5, block.getDescription());
+            preparedStatement.setInt(6, block.getNumberOfFlats());
+            preparedStatement.setInt(7, block.getNumberOfFloors());
+            preparedStatement.setDate(8, (java.sql.Date) block.getPaymentDeadline());
+            preparedStatement.setDate(9, (java.sql.Date) block.getStartingDate());
 
 
             preparedStatement.executeUpdate();

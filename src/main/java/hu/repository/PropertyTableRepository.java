@@ -8,11 +8,11 @@ import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
-public class PropertyTable {
+public class PropertyTableRepository {
 
     Connection connection;
 
-    public PropertyTable() {
+    public PropertyTableRepository() {
         try {
             this.connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
         } catch (SQLException throwables) {

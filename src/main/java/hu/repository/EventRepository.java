@@ -33,9 +33,9 @@ public class EventRepository {
 
     public void createEventTable() {
         String sqlCreateTable = "CREATE TABLE IF NOT EXISTS event (" +
-                "id INT PRIMARY KEY, " +
+                "id INT PRIMARY KEY AUTO_INCREMENT, " +
                 "sender INT, " +
-                "eventName VARCHAR(30) NOT NULL, " +
+                "event_name VARCHAR(30) NOT NULL, " +
                 "description VARCHAR(255) NOT NULL, " +
                 "date DATE NOT NULL, " +
                 "event_date DATE NOT NULL, " +
@@ -49,20 +49,28 @@ public class EventRepository {
 
     public String createNewEvent(Event event) {
         String infoBack = "Event can not be created";
-        String insertEventStatement = "INSERT INTO event VALUES (?,?,?,?,?,?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(insertEventStatement)) {
+        String insertEventStatement = "INSERT INTO event " +
+                "(sender, event_name, description, date, event_date) " +
+                "VALUES (?,?,?,?,?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertEventStatement,
+                Statement.RETURN_GENERATED_KEYS)) {
 
-            preparedStatement.setInt(1, event.getId());
             if (!(event instanceof Reminder)) {
-                preparedStatement.setInt(2, ((Complain) event).getAccount().getId());
+                preparedStatement.setInt(1, ((Complain) event).getAccount().getId());
             }
-            preparedStatement.setString(3, event.getEventName());
-            preparedStatement.setString(4, event.getDescription());
-            preparedStatement.setDate(5, (java.sql.Date) event.getDate());
-            preparedStatement.setDate(6, (java.sql.Date) event.getEventDate());
-
+            preparedStatement.setString(2, event.getEventName());
+            preparedStatement.setString(3, event.getDescription());
+            preparedStatement.setDate(4, (java.sql.Date) event.getDate());
+            preparedStatement.setDate(5, (java.sql.Date) event.getEventDate());
             preparedStatement.executeUpdate();
-            eventTableRepository.createNewEventConnectionTable(event);
+
+            ResultSet rs = preparedStatement.getGeneratedKeys();
+            int generatedKey = 0;
+            if (rs.next()) {
+                generatedKey = rs.getInt(1);
+            }
+
+            eventTableRepository.createNewEventConnectionTable(event, generatedKey);
             infoBack = "Event created";
         } catch (
                 SQLException throwables) {

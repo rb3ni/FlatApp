@@ -19,14 +19,14 @@ public class InitFlatApp {
         AccountRepository accountRepository = new AccountRepository();
         SpaceRepository spaceRepository = new SpaceRepository();
         SpaceTypeRepository spaceTypeRepository = new SpaceTypeRepository();
-        PropertyTable propertyTable = new PropertyTable();
+        PropertyTableRepository propertyTableRepository = new PropertyTableRepository();
         BlockRepository blockRepository = new BlockRepository();
 
         accountRepository.createAccountTable();
         transactionRepository.createTransactionTable();
         spaceTypeRepository.createSpaceTypeRepository();
         spaceRepository.createSpaceTable();
-        propertyTable.createPropertyTable();
+        propertyTableRepository.createPropertyTable();
         blockRepository.createBlockTable();
 
 
@@ -145,9 +145,9 @@ public class InitFlatApp {
         transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
         System.out.println(transactionRepository.unassignedTransactions());
 
-        propertyTable.assignHabitantAndSpace(111111, 1);
-        propertyTable.assignHabitantAndSpace(111111, 2);
-        System.out.println(propertyTable.searchSpacesByHabitantId(111111));
+        propertyTableRepository.assignHabitantAndSpace(111111, 1);
+        propertyTableRepository.assignHabitantAndSpace(111111, 2);
+        System.out.println(propertyTableRepository.searchSpacesByHabitantId(111111));
 
         block.updateTransactions();
 

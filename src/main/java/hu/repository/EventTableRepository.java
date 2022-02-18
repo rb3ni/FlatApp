@@ -39,27 +39,29 @@ public class EventTableRepository {
         }
     }
 
-    public String createNewEventConnectionTable(Event event) {
+    public String createNewEventConnectionTable(Event event, int generatedKey) {
         String infoBack = "Event_table can not be created";
-        String insertEventStatement = "INSERT INTO event_table VALUES (?,?,?,?)";
+        String insertEventStatement = "INSERT INTO event_table " +
+                "(space_id, account_id, event_id)" +
+                "VALUES (?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertEventStatement)) {
 
             if (event instanceof Complain) {
                 for (Account receiver : ((Complain) event).getReceivers()) {
-                    preparedStatement.setInt(4, event.getId());
-                    preparedStatement.setInt(3, receiver.getId());
+                    preparedStatement.setInt(3, generatedKey);
+                    preparedStatement.setInt(2, receiver.getId());
                     preparedStatement.addBatch();
                 }
             } else if (event instanceof Emergency) {
                 for (Space space : ((Emergency) event).getAffectedSpaces()) {
-                    preparedStatement.setInt(4, event.getId());
-                    preparedStatement.setInt(3, space.getId());
+                    preparedStatement.setInt(3, generatedKey);
+                    preparedStatement.setInt(1, space.getId());
                     preparedStatement.addBatch();
                 }
             } else {
                 for (Space space : ((Reminder) event).getAffectedSpaces()) {
-                    preparedStatement.setInt(4, event.getId());
-                    preparedStatement.setInt(3, space.getId());
+                    preparedStatement.setInt(3, generatedKey);
+                    preparedStatement.setInt(1, space.getId());
                     preparedStatement.addBatch();
                 }
             }
