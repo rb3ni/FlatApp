@@ -5,10 +5,11 @@ import hu.domain.account.ExternalService;
 import hu.domain.account.Habitant;
 import hu.domain.space.Space;
 import hu.domain.space.SpaceType;
-import hu.repository.*;
 import hu.repository.BlockRepository;
+import hu.repository.PropertyTableRepository;
 import hu.repository.SpaceRepositories.SpaceRepository;
 import hu.repository.SpaceRepositories.SpaceTypeRepository;
+import hu.repository.TransactionRepository;
 import hu.repository.accountRepositories.AccountRepository;
 
 import java.sql.Date;
@@ -35,6 +36,8 @@ public class InitFlatApp {
 
 
         Habitant habitant;
+        Habitant habitant2;
+        Habitant habitant3;
         ExternalService externalService;
         SpaceType spaceType;
         SpaceType spaceType2;
@@ -59,6 +62,24 @@ public class InitFlatApp {
                 32,
                 "CEO a Wayne vállalatnál");
 
+        habitant2 = new Habitant(
+                "Matt Damon",
+                4441234,
+                "immattdamon@damon.com",
+                "Lakó",
+                50000,
+                51,
+                "Színész");
+
+        habitant3 = new Habitant(
+                "Private Ryan",
+                5551234,
+                "saveme@fromdeath.com",
+                "Túlélő",
+                10000,
+                24,
+                "Közlegény");
+
         externalService = new ExternalService(
                 "Pablo Escobar",
                 5554321,
@@ -69,6 +90,8 @@ public class InitFlatApp {
 
 
         System.out.println(accountRepository.createNewAccount(habitant));
+        System.out.println(accountRepository.createNewAccount(habitant2));
+        System.out.println(accountRepository.createNewAccount(habitant3));
         System.out.println(accountRepository.createNewAccount(externalService));
         System.out.println(accountRepository.searchAccountById(1));
         System.out.println(accountRepository.searchAccountById(2));
