@@ -50,7 +50,7 @@ public class SpaceTypeRepository {
             preparedStatement.setString(6, spaceType.getDescription());
             preparedStatement.setInt(7, spaceType.getBlockId());
             preparedStatement.executeUpdate();
-            infoBack = "Space-type created";
+            infoBack = "Space-type " + spaceType.getSpaceType() + " created";
         } catch (
                 SQLException throwables) {
             throwables.printStackTrace();

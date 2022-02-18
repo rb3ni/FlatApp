@@ -1,5 +1,6 @@
 package hu.repository;
 
+import hu.domain.space.Space;
 import hu.repository.accountRepositories.AccountRepository;
 
 import java.io.BufferedReader;
@@ -75,9 +76,9 @@ public class TransactionRepository {
 
         if (isNotDuplicate(transactionNumber)) {
             System.out.println(transactionCreateHelper(transactionData));
-            infoBack = "Transaction saved";
+            infoBack = "Transaction " + transactionData[5] + " saved";
         } else {
-            infoBack = "Transaction already saved";
+            infoBack = "Transaction " + transactionData[5] + " already saved";
         }
 
         return infoBack;
@@ -98,8 +99,9 @@ public class TransactionRepository {
             preparedStatement.setInt(5, Integer.parseInt(transactionData[3]));
             preparedStatement.setString(6, transactionData[4]);
             preparedStatement.setString(7, transactionData[5]);
-            if (assignAccount(transactionData[4]) != null) {
-                preparedStatement.setInt(8, assignAccount(transactionData[4]));
+            Integer accountId = assignAccount(transactionData[4], Integer.parseInt(transactionData[3]));
+            if (accountId != null) {
+                preparedStatement.setInt(8, accountId);
             } else {
                 preparedStatement.setNull(8, Types.INTEGER);
             }
@@ -146,15 +148,18 @@ public class TransactionRepository {
         return java.sql.Time.valueOf(dt.toLocalTime());
     }
 
-    private Integer assignAccount(String transactionText) {
+    private Integer assignAccount(String transactionText, int cost) {
 
         AccountRepository accountRepository = new AccountRepository();
         List<Integer> idList = accountRepository.accountIdList();
         Integer accountIdFound = null;
 
+        //TODO név alapú keresés
+
         for (Integer integer : idList) {
             if (transactionText.contains(integer.toString())) {
                 accountIdFound = integer;
+                balanceUpdate(accountIdFound, cost);
                 break;
             }
         }
@@ -198,6 +203,71 @@ public class TransactionRepository {
             throwables.printStackTrace();
         }
         return date;
+    }
+
+    private void balanceUpdate(int accountId, int cost) {
+
+        List<Integer> spaceIds = null;
+        List<Integer> balances = null;
+        List<Integer> costs = null;
+
+        String sql = "SELECT pt.account_id AS account_id, s.id AS space_id, st.cost, s.balance " +
+                "FROM property_table pt " +
+                "JOIN space s ON s.id = pt.space_id " +
+                "JOIN space_type st ON st.space_type = s.space_type " +
+                "WHERE pt.account_id = ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, accountId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                spaceIds.add(resultSet.getInt("space_id"));
+                balances.add(resultSet.getInt("balance"));
+                costs.add(resultSet.getInt("cost"));
+            }
+
+            balanceUpdateDecider(spaceIds, balances, costs, cost);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    private void balanceUpdateDecider(List<Integer> spaceIds, List<Integer> balances, List<Integer> costs, int cost) {
+
+        int remainingCost = cost;
+        int costToAdd = 0;
+        boolean overPayment = false;
+        while (remainingCost != 0) {
+
+            for (int i = 0; i < spaceIds.size(); i++) {
+                if (balances.get(i) < 0 && !overPayment) {
+                    if (costs.get(i) < remainingCost) {
+                        costToAdd = costs.get(i);
+                    } else {
+                        costToAdd = remainingCost;
+                    }
+                    balanceSetter(spaceIds.get(i), costToAdd, balances.get(i));
+                    remainingCost -= costToAdd;
+                }
+            }
+            overPayment = true;
+        }
+    }
+
+    private void balanceSetter(int spaceId, int cost, int balance) {
+        String overwriteStatement = "UPDATE space " +
+                "SET balance = ? WHERE id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(overwriteStatement)) {
+            preparedStatement.setInt(1, balance + cost);
+            preparedStatement.setInt(2, spaceId);
+            preparedStatement.executeUpdate();
+        } catch (
+                SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
 // TODO public assignAccountManuallyByTransactionNumber

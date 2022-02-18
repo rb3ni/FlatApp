@@ -149,11 +149,11 @@ public class InitFlatApp {
         System.out.println(spaceTypeRepository.createNewSpaceType(spaceType3));
         System.out.println(spaceTypeRepository.createNewSpaceType(spaceType4));
         System.out.println(spaceTypeRepository.createNewSpaceType(spaceType5));
-        spaceRepository.createNewSpace(space);
-        spaceRepository.createNewSpace(space2);
-        spaceRepository.createNewSpace(space3);
-        spaceRepository.createNewSpace(space4);
-        spaceRepository.createNewSpace(space5);
+        System.out.println(spaceRepository.createNewSpace(space));
+        System.out.println(spaceRepository.createNewSpace(space2));
+        System.out.println(spaceRepository.createNewSpace(space3));
+        System.out.println(spaceRepository.createNewSpace(space4));
+        System.out.println(spaceRepository.createNewSpace(space5));
 
 
         String deadLineS = "2022-01-15";
@@ -168,14 +168,14 @@ public class InitFlatApp {
 
         blockRepository.createNewBlock(block);
 
-        transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
         System.out.println(transactionRepository.unassignedTransactions());
 
         propertyTableRepository.assignHabitantAndSpace(111111, 1);
         propertyTableRepository.assignHabitantAndSpace(111111, 2);
+        //transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
         System.out.println(propertyTableRepository.searchSpacesByHabitantId(111111));
 
-        block.updateTransactions();
+        //block.updateTransactions();
 
     }
 

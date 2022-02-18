@@ -70,13 +70,31 @@ public class Block {
         currentDate = java.sql.Date.valueOf(localDate);
         java.sql.Date updatedDate = deadlineChecker(currentDate);
 
+        String sql = "SELECT * FROM space s " +
+                "JOIN space_type st ON st.space_type = s.space_type " +
+                "JOIN space_type st ON st.space_type = s.space_type " +
+                "JOIN space_type st ON st.space_type = s.space_type " +
+                "JOIN space_type st ON st.space_type = s.space_type " +
+                "WHERE s.id = ?;";
+
+
+
+
+
+
         if (!currentDate.equals(updatedDate)){
             System.out.println(previousDeadline);
             System.out.println(updatedDate);
-
             //TODO balance frissítés
-            //TODO reminderek küldése
+            newMonthCostUpdate();
+
+            //flatek balance-ából levonni a flattype costot
+            // transaction-account-space-flattype kapcsolat
+
         }
+
+            //TODO reminderek küldése - másik method
+            //TODO elmaradottak összeszedése
 
 
     }
@@ -102,6 +120,16 @@ public class Block {
 
 
         return deadline;
+    }
+
+    private void newMonthCostUpdate(){
+
+
+
+    }
+
+    private void balanceUpdate(){
+
     }
 
 

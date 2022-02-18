@@ -48,7 +48,7 @@ public class SpaceRepository {
             preparedStatement.setInt(4, space.getBalance());
 
             preparedStatement.executeUpdate();
-            infoBack = "Space created";
+            infoBack = space.getSpaceType() + " Space at " + space.getFloor() + " floor, " + space.getDoor() + " door created";
         } catch (
                 SQLException throwables) {
             throwables.printStackTrace();
@@ -66,14 +66,13 @@ public class SpaceRepository {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            resultSet.next();
+
+            while (resultSet.next()) {
             int spaceFloor = resultSet.getInt("floor");
             int spaceDoor = resultSet.getInt("door");
             String spaceType = resultSet.getString("space_type");
             Integer blockId = resultSet.getInt("block_id");
             int balance = resultSet.getInt("balance");
-
-            while (resultSet.next()) {
                 space = new Space(id, spaceFloor, spaceDoor, null, spaceType, blockId, balance); // TODO ez miért van whileban?
             }
         } catch (SQLException throwables) {

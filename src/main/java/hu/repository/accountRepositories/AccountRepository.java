@@ -47,7 +47,8 @@ public class AccountRepository {
         String insertAccountStatement = "INSERT INTO account VALUES (?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertAccountStatement)) {
 
-            preparedStatement.setInt(1, generateId());
+            int id = generateId();
+            preparedStatement.setInt(1, id);
             preparedStatement.setString(2, account.getName());
             preparedStatement.setInt(3, account.getPhoneNumber());
             preparedStatement.setString(4, account.getEmail());
@@ -66,7 +67,7 @@ public class AccountRepository {
                 preparedStatement.setString(10, ((ExternalService) account).getCompanyName());
             }
             preparedStatement.executeUpdate();
-            infoBack = "Account created";
+            infoBack = "Account " + id + " created";
         } catch (
                 SQLException throwables) {
             throwables.printStackTrace();
