@@ -37,7 +37,7 @@ public class EventRepository {
         String sqlCreateTable = "CREATE TABLE IF NOT EXISTS event (" +
                 "id INT PRIMARY KEY AUTO_INCREMENT, " +
                 "sender INT, " +
-                "event_name VARCHAR(30) NOT NULL, " +
+                "event_name VARCHAR(50) NOT NULL, " +
                 "description VARCHAR(255) NOT NULL, " +
                 "date DATE NOT NULL, " +
                 "event_date DATE NOT NULL, " +
@@ -58,7 +58,15 @@ public class EventRepository {
                 Statement.RETURN_GENERATED_KEYS)) {
 
             if (!(event instanceof Reminder)) {
-                preparedStatement.setInt(1, ((Complain) event).getAccount().getId());
+                if (event instanceof Complain) {
+                    preparedStatement.setInt(1, ((Complain) event).getAccount().getId());
+                } else if (event instanceof Emergency) {
+                    preparedStatement.setInt(1, ((Emergency) event).getAccount().getId());
+                } else {
+                    preparedStatement.setNull(1,Types.INTEGER);
+                }
+            } else {
+                preparedStatement.setNull(1,Types.INTEGER); // TODO A sok IF-t átírom majd logikailag jó.
             }
             preparedStatement.setString(2, event.getEventName());
             preparedStatement.setString(3, event.getDescription());
@@ -72,7 +80,9 @@ public class EventRepository {
                 generatedKey = rs.getInt(1);
             }
 
-            eventTableRepository.createNewEventConnectionTable(event, generatedKey);
+            if (event instanceof Reminder || event instanceof Emergency || event instanceof Complain) {
+                eventTableRepository.createNewEventConnectionTable(event, generatedKey);
+            }
             infoBack = "Event created";
         } catch (
                 SQLException throwables) {

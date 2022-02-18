@@ -4,12 +4,13 @@ import hu.domain.account.Account;
 import hu.domain.account.ExternalService;
 import hu.domain.account.Habitant;
 import hu.domain.space.Space;
-import hu.repository.*;
 import hu.repository.BlockRepository;
 import hu.repository.EventRepositories.EventRepository;
 import hu.repository.EventRepositories.EventTableRepository;
+import hu.repository.PropertyTableRepository;
 import hu.repository.SpaceRepositories.SpaceRepository;
 import hu.repository.SpaceRepositories.SpaceTypeRepository;
+import hu.repository.TransactionRepository;
 import hu.repository.accountRepositories.AccountRepository;
 import hu.ui.Ui;
 
@@ -59,7 +60,12 @@ public class FlatAppMenu {
                 case 1:
                     System.out.print("Please give the path of the file: ");
                     String path = ui.askTextFromUser();
-                    // TODO
+
+                    tR.readTransactions(path);
+                    // TODO Innen egyelőre nem látom még hogyan tovább.
+                    uploadTransactionSubMenu(); // van erre szükség egyáltalán?
+                    // List<Account> misssingAccounts = checkMissingAccountsFromTransactions();
+                    // addAccountManuallyToAccounts();
                     break;
                 case 2:
                     // TODO transaction method for this?
@@ -105,6 +111,7 @@ public class FlatAppMenu {
         }
     }
 
+
     private void createNewAccountSubMenu() {
         System.out.println("Press number for choose between options");
         System.out.println("1: Create new Habitant");
@@ -127,12 +134,19 @@ public class FlatAppMenu {
                 int age = ui.askIntFromUser();
                 System.out.print("Give occupation: ");
                 String occupation = ui.askTextFromUser();
-
+                //TODO
                 aR.createNewAccount(new Habitant(name, phoneNumber, email, responsibility, cost, age, occupation));
                 break;
             case 2:
                 // TODO transaction method for this?
                 break;
         }
+    }
+
+    private void uploadTransactionSubMenu() {
+        System.out.println("Press number for choose between options");
+        System.out.println("1: Check missing Accounts from Transactions"); // Nem biztos hogy ez az egész kell
+        System.out.println("2: Create new External Service");
+        int userInput = ui.askIntFromUser();
     }
 }

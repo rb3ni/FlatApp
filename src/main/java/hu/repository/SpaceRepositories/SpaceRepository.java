@@ -59,12 +59,14 @@ public class SpaceRepository {
     public Space searchSpacesBySpaceId(int id) {
         Space space = null;
         String sql = "SELECT * FROM space s " +
+                "JOIN space_type st ON st.space_type = s.space_type " +
                 "WHERE s.id = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
+            resultSet.next();
             int spaceFloor = resultSet.getInt("floor");
             int spaceDoor = resultSet.getInt("door");
             String spaceType = resultSet.getString("space_type");
@@ -72,7 +74,7 @@ public class SpaceRepository {
             int balance = resultSet.getInt("balance");
 
             while (resultSet.next()) {
-                space = new Space(id, spaceFloor, spaceDoor, null, spaceType, blockId, balance);
+                space = new Space(id, spaceFloor, spaceDoor, null, spaceType, blockId, balance); // TODO ez miért van whileban?
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -83,6 +85,7 @@ public class SpaceRepository {
     public Space searchSpacesByFloorAndDoor(int floor, int door) {
         Space space = null;
         String sql = "SELECT * FROM space s " +
+                "JOIN space_type st ON st.space_type = s.space_type " +
                 "WHERE s.floor = ? AND s.door = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -105,7 +108,7 @@ public class SpaceRepository {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return null;
+        return space;
     }
 
     public List<Space> searchSpacesByAccountNameAndEmail(String nameForSpaces, String emailForSpaces) {

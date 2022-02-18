@@ -45,9 +45,9 @@ public class EventTableRepository {
                 "(space_id, account_id, event_id)" +
                 "VALUES (?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertEventStatement)) {
-
             if (event instanceof Complain) {
                 for (Account receiver : ((Complain) event).getReceivers()) {
+                    preparedStatement.setNull(1,Types.INTEGER);
                     preparedStatement.setInt(3, generatedKey);
                     preparedStatement.setInt(2, receiver.getId());
                     preparedStatement.addBatch();
@@ -56,12 +56,14 @@ public class EventTableRepository {
                 for (Space space : ((Emergency) event).getAffectedSpaces()) {
                     preparedStatement.setInt(3, generatedKey);
                     preparedStatement.setInt(1, space.getId());
+                    preparedStatement.setNull(2,Types.INTEGER);
                     preparedStatement.addBatch();
                 }
             } else {
                 for (Space space : ((Reminder) event).getAffectedSpaces()) {
                     preparedStatement.setInt(3, generatedKey);
                     preparedStatement.setInt(1, space.getId());
+                    preparedStatement.setNull(2,Types.INTEGER);
                     preparedStatement.addBatch();
                 }
             }
