@@ -1,9 +1,6 @@
 package hu.repository;
 
 import hu.domain.Block;
-import hu.domain.account.Account;
-import hu.domain.account.ExternalService;
-import hu.domain.account.Habitant;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -60,8 +57,6 @@ public class BlockRepository {
             preparedStatement.setDate(10, (java.sql.Date) block.getStartingDate());
 
 
-
-
             preparedStatement.executeUpdate();
             infoBack = "Block created";
         } catch (
@@ -82,6 +77,7 @@ public class BlockRepository {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
+            resultSet.next();
             String city = resultSet.getString("city");
             int postalCode = resultSet.getInt("postal_code");
             String street = resultSet.getString("street");
@@ -92,7 +88,7 @@ public class BlockRepository {
             Date paymentDeadLine = resultSet.getDate("payment_deadline");
             Date startingDate = resultSet.getDate("payment_deadline");
             List<Integer> spaces = spaceIdList(resultSet);
-            List<Integer> accounts = getAccountsId(resultSet);
+            List<Integer> accounts = getAccountsId(resultSet); //Ez már lehet nem fut le így. illetve nem vagyok biztos benne egyáltalán kell mint attributum.
 
             return new Block(id, city, postalCode, street, houseNumber, description, numberOfSpaces,
                     numberOfFloors, spaces, accounts, paymentDeadLine, startingDate);
@@ -107,9 +103,9 @@ public class BlockRepository {
     private List<Integer> spaceIdList(ResultSet resultSet) {
         List<Integer> spaceIdList = new ArrayList<>();
         try {
-            while (resultSet.next()) {
+            do {
                 spaceIdList.add(resultSet.getInt("s.id"));
-            }
+            } while (resultSet.next());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -119,9 +115,9 @@ public class BlockRepository {
     private List<Integer> getAccountsId(ResultSet resultSet) {
         List<Integer> idList = new ArrayList<>();
         try {
-            while (resultSet.next()) {
+            do {
                 idList.add(resultSet.getInt("pt.account_id"));
-            }
+            } while (resultSet.next());
         } catch (SQLException e) {
             e.printStackTrace();
         }
