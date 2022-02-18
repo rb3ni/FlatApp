@@ -1,4 +1,4 @@
-package hu.repository;
+package hu.repository.SpaceRepositories;
 
 import hu.domain.space.SpaceType;
 

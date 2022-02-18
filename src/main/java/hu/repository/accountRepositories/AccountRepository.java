@@ -1,4 +1,4 @@
-package hu.repository;
+package hu.repository.accountRepositories;
 
 import hu.domain.account.Account;
 import hu.domain.account.ExternalService;
@@ -193,4 +193,13 @@ public class AccountRepository {
         }
     }
 
+    public List<Account> searchAccountsBySpace(int floor, int door) {
+        // TODO
+        return null;
+    }
+
+    public List<ExternalService> listAllExternalService() {
+        //TODO
+        return null;
+    }
 }

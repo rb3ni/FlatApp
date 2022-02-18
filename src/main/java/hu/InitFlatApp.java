@@ -6,6 +6,10 @@ import hu.domain.account.Habitant;
 import hu.domain.space.Space;
 import hu.domain.space.SpaceType;
 import hu.repository.*;
+import hu.repository.BlockRepository;
+import hu.repository.SpaceRepositories.SpaceRepository;
+import hu.repository.SpaceRepositories.SpaceTypeRepository;
+import hu.repository.accountRepositories.AccountRepository;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -33,7 +37,6 @@ public class InitFlatApp {
         Habitant habitant;
         ExternalService externalService;
         SpaceType spaceType;
-        SpaceType spaceType1;
         SpaceType spaceType2;
         SpaceType spaceType3;
         SpaceType spaceType4;

@@ -1,8 +1,9 @@
-package hu.repository;
+package hu.repository.SpaceRepositories;
 
 import hu.domain.space.Space;
 
 import java.sql.*;
+import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
@@ -104,6 +105,11 @@ public class SpaceRepository {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+        return null;
+    }
+
+    public List<Space> searchSpacesByAccountNameAndEmail(String nameForSpaces, String emailForSpaces) {
+        //TODO
         return null;
     }
 }

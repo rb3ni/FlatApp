@@ -1,4 +1,4 @@
-package hu.repository;
+package hu.repository.EventRepositories;
 
 import hu.domain.account.Account;
 import hu.domain.event.Complain;
@@ -6,6 +6,8 @@ import hu.domain.event.Emergency;
 import hu.domain.event.Event;
 import hu.domain.event.Reminder;
 import hu.domain.space.Space;
+import hu.repository.SpaceRepositories.SpaceRepository;
+import hu.repository.accountRepositories.AccountRepository;
 
 import java.sql.*;
 import java.util.ArrayList;

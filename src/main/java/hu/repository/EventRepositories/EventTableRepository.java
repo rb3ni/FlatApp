@@ -1,4 +1,4 @@
-package hu.repository;
+package hu.repository.EventRepositories;
 
 import hu.domain.account.Account;
 import hu.domain.event.Complain;
