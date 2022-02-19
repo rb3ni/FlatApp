@@ -11,8 +11,7 @@ import hu.repository.EventRepositories.EventTableRepository;
 import hu.repository.SpaceRepositories.SpaceRepository;
 import hu.repository.accountRepositories.AccountRepository;
 
-import java.sql.Connection;
-import java.sql.Date;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -87,4 +86,5 @@ public class SandBoxBen {
         eventRepository.createNewEvent(emergency);
         eventRepository.createNewEvent(event);
     }
+
 }

@@ -4,6 +4,7 @@ import hu.domain.account.ExternalService;
 import hu.domain.account.Habitant;
 import hu.domain.space.Space;
 import hu.repository.SpaceRepositories.SpaceRepository;
+import hu.repository.accountRepositories.AccountRepository;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -13,13 +14,25 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import static hu.repository.DatabaseConfigFlatApp.*;
+
 public class SandBox {
     Connection connection;
+
+    public SandBox() {
+        try {
+            this.connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         SandBox sandBox = new SandBox();
         TransactionRepository transactionRepository = new TransactionRepository();
         SpaceRepository spaceRepository = new SpaceRepository();
+        AccountRepository accountRepository = new AccountRepository();
+        SandBoxBen sandBoxBen = new SandBoxBen();
 
 
         //System.out.println(transactionRepository.getDeadline());
@@ -56,9 +69,15 @@ public class SandBox {
 //
 //        }
 
-        System.out.println(spaceRepository.searchSpacesBySpaceId(1));
-        System.out.println(sandBox.balanceUpdate());
+        //System.out.println(spaceRepository.searchSpacesBySpaceId(1));
+        //System.out.println(spaceRepository.accountIdListFake());
 
+        //System.out.println(sandBox.accountIdListFake());
+        transactionRepository.createTransactionTable();
+        transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
+        //System.out.println(accountRepository.accountIdList());
+        //System.out.println(sandBox.isNotDuplicate("7765GJJJH7"));
+        //System.out.println(sandBox.isNotDuplicate("TR9876FSAF"));
 
     }
 
@@ -79,22 +98,43 @@ public class SandBox {
 //    }
 
 
-    public String balanceUpdate() {
-        String plane = null;
-        String sql = "SELECT * FROM account WHERE id = ?";
+    public List<Integer> accountIdListFake() {
+        List<Integer> idList = new ArrayList<>();
+        String sql = "SELECT pt.account_id AS account_id, s.id AS space_id, st.cost, s.balance " +
+                "FROM property_table pt " +
+                "JOIN space s ON s.id = pt.space_id " +
+                "JOIN space_type st ON st.space_type = s.space_type " +
+                "WHERE pt.account_id = ?;";
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, 111111);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (resultSet.next()) {
-
-                plane = resultSet.getString("name");
-
+            while (resultSet.next()) {
+                idList.add(resultSet.getInt("space_id"));
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return plane;
+        return idList;
+    }
+
+
+    private boolean isNotDuplicate(String transactionNumber) {
+        boolean isNotDuplicate = true;
+        String sqlCheck = "SELECT * FROM transactions WHERE transaction_number = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sqlCheck)) {
+            preparedStatement.setString(1, transactionNumber);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                isNotDuplicate = false;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return isNotDuplicate;
+
     }
 }
 

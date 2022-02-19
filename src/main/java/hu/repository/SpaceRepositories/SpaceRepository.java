@@ -3,6 +3,7 @@ package hu.repository.SpaceRepositories;
 import hu.domain.space.Space;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
@@ -114,4 +115,23 @@ public class SpaceRepository {
         //TODO
         return null;
     }
+
+    public List<Integer> accountIdListFake() {
+        List<Integer> idList = new ArrayList<>();
+        String sql = "SELECT * FROM property_table";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                idList.add(resultSet.getInt("id"));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return idList;
+    }
+
+
+
 }

@@ -18,10 +18,12 @@ import static hu.repository.DatabaseConfigFlatApp.*;
 public class TransactionRepository {
 
     Connection connection;
+    Connection connection1;
 
     public TransactionRepository() {
         try {
             this.connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+            this.connection1 = DriverManager.getConnection(DB_URL, USER, PASSWORD);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -123,7 +125,6 @@ public class TransactionRepository {
             preparedStatement.setString(1, transactionNumber);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-
             if (resultSet.next()) {
                 isNotDuplicate = false;
             }
@@ -154,12 +155,13 @@ public class TransactionRepository {
         List<Integer> idList = accountRepository.accountIdList();
         Integer accountIdFound = null;
 
-        //TODO név alapú keresés
+        //TODO név alapú keresés is
 
         for (Integer integer : idList) {
             if (transactionText.contains(integer.toString())) {
                 accountIdFound = integer;
                 balanceUpdate(accountIdFound, cost);
+                //TODO itt száll el
                 break;
             }
         }
@@ -207,9 +209,9 @@ public class TransactionRepository {
 
     private void balanceUpdate(int accountId, int cost) {
 
-        List<Integer> spaceIds = null;
-        List<Integer> balances = null;
-        List<Integer> costs = null;
+        List<Integer> spaceIds = new ArrayList<>();
+        List<Integer> balances = new ArrayList<>();
+        List<Integer> costs = new ArrayList<>();
 
         String sql = "SELECT pt.account_id AS account_id, s.id AS space_id, st.cost, s.balance " +
                 "FROM property_table pt " +
@@ -242,7 +244,7 @@ public class TransactionRepository {
         while (remainingCost != 0) {
 
             for (int i = 0; i < spaceIds.size(); i++) {
-                if (balances.get(i) < 0 && !overPayment) {
+                if (balances.get(i) <= 0 && !overPayment) {
                     if (costs.get(i) < remainingCost) {
                         costToAdd = costs.get(i);
                     } else {
