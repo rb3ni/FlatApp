@@ -172,7 +172,7 @@ public class InitFlatApp {
 
         propertyTableRepository.assignHabitantAndSpace(111111, 1);
         propertyTableRepository.assignHabitantAndSpace(111111, 2);
-        //transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
+        transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
         System.out.println(propertyTableRepository.searchSpacesByHabitantId(111111));
 
         //block.updateTransactions();

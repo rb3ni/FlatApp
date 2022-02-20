@@ -11,6 +11,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
@@ -18,12 +19,10 @@ import static hu.repository.DatabaseConfigFlatApp.*;
 public class TransactionRepository {
 
     Connection connection;
-    Connection connection1;
 
     public TransactionRepository() {
         try {
             this.connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
-            this.connection1 = DriverManager.getConnection(DB_URL, USER, PASSWORD);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -149,7 +148,7 @@ public class TransactionRepository {
         return java.sql.Time.valueOf(dt.toLocalTime());
     }
 
-    private Integer assignAccount(String transactionText, int cost) {
+    private Integer assignAccount(String transactionText, int amount) {
 
         AccountRepository accountRepository = new AccountRepository();
         List<Integer> idList = accountRepository.accountIdList();
@@ -160,7 +159,7 @@ public class TransactionRepository {
         for (Integer integer : idList) {
             if (transactionText.contains(integer.toString())) {
                 accountIdFound = integer;
-                balanceUpdate(accountIdFound, cost);
+                balanceUpdate(accountIdFound, amount);
                 //TODO itt száll el
                 break;
             }
@@ -207,7 +206,7 @@ public class TransactionRepository {
         return date;
     }
 
-    private void balanceUpdate(int accountId, int cost) {
+    private void balanceUpdate(int accountId, int amount) {
 
         List<Integer> spaceIds = new ArrayList<>();
         List<Integer> balances = new ArrayList<>();
@@ -229,41 +228,49 @@ public class TransactionRepository {
                 costs.add(resultSet.getInt("cost"));
             }
 
-            balanceUpdateDecider(spaceIds, balances, costs, cost);
+            balanceUpdateDecider(spaceIds, balances, costs, amount);
+
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
 
-    private void balanceUpdateDecider(List<Integer> spaceIds, List<Integer> balances, List<Integer> costs, int cost) {
-
-        int remainingCost = cost;
+    private void balanceUpdateDecider(List<Integer> spaceIds, List<Integer> balances, List<Integer> costs, int amount) {
+        int numbrOfSpaces = spaceIds.size();
+        int remainingCost = amount;
         int costToAdd = 0;
-        boolean overPayment = false;
+        boolean hasDebt = true;
+
         while (remainingCost != 0) {
 
-            for (int i = 0; i < spaceIds.size(); i++) {
-                if (balances.get(i) <= 0 && !overPayment) {
-                    if (costs.get(i) < remainingCost) {
-                        costToAdd = costs.get(i);
+            for (int i = 0; i < numbrOfSpaces; i++) {
+                if (balances.get(i) < 0 || !hasDebt) {
+                    if (amountIsGreater(remainingCost, costs.get(i))) {
+                        balanceSetter(spaceIds.get(i), costs.get(i), balances.get(i));
+                        remainingCost -= costs.get(i);
+                        balances.set(i, balances.get(i) + costs.get(i));
                     } else {
-                        costToAdd = remainingCost;
+                        balanceSetter(spaceIds.get(i), remainingCost, balances.get(i));
+                        remainingCost = 0;
+                        break;
                     }
-                    balanceSetter(spaceIds.get(i), costToAdd, balances.get(i));
-                    remainingCost -= costToAdd;
                 }
             }
-            overPayment = true;
+            hasDebt = false;
         }
     }
 
-    private void balanceSetter(int spaceId, int cost, int balance) {
+    private boolean amountIsGreater(int amount, int cost) {
+        return amount > cost;
+    }
+
+    private void balanceSetter(int spaceId, int amountToAdd, int balance) {
         String overwriteStatement = "UPDATE space " +
                 "SET balance = ? WHERE id = ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(overwriteStatement)) {
-            preparedStatement.setInt(1, balance + cost);
+            preparedStatement.setInt(1, balance + amountToAdd);
             preparedStatement.setInt(2, spaceId);
             preparedStatement.executeUpdate();
         } catch (
