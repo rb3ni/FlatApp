@@ -1,5 +1,7 @@
 package hu.domain;
 
+import hu.domain.space.Space;
+import hu.repository.BlockRepository;
 import hu.repository.TransactionRepository;
 
 import java.sql.Connection;
@@ -16,6 +18,7 @@ import java.util.List;
 
 public class Block {
 
+    BlockRepository blockRepository = new BlockRepository();
     TransactionRepository transactionRepository = new TransactionRepository();
 
     private int id;
@@ -61,8 +64,7 @@ public class Block {
     }
 
 
-    public void updateTransactions() {
-        transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
+    public void updateTransactions(String path) {
 
         java.sql.Date previousDeadline = transactionRepository.getDeadline();
         java.sql.Date currentDate;
@@ -70,67 +72,39 @@ public class Block {
         currentDate = java.sql.Date.valueOf(localDate);
         java.sql.Date updatedDate = deadlineChecker(currentDate);
 
-        String sql = "SELECT * FROM space s " +
-                "JOIN space_type st ON st.space_type = s.space_type " +
-                "JOIN space_type st ON st.space_type = s.space_type " +
-                "JOIN space_type st ON st.space_type = s.space_type " +
-                "JOIN space_type st ON st.space_type = s.space_type " +
-                "WHERE s.id = ?;";
-
-
-
-
-
-
-        if (!currentDate.equals(updatedDate)){
-            System.out.println(previousDeadline);
-            System.out.println(updatedDate);
-            //TODO balance frissítés
-            newMonthCostUpdate();
-
-            //flatek balance-ából levonni a flattype costot
-            // transaction-account-space-flattype kapcsolat
-
+        if (!previousDeadline.equals(updatedDate)) {
+            blockRepository.deadlineSetter(updatedDate,1);
+            blockRepository.newMonthCostUpdate(1);
         }
-
-            //TODO reminderek küldése - másik method
-            //TODO elmaradottak összeszedése
-
-
+            //"src/main/resources/Transactions22_02.csv"
+            transactionRepository.readTransactions(path);
     }
+    //TODO reminderek küldése - másik method
+    //TODO elmaradottak összeszedése
 
 
     private java.sql.Date deadlineChecker(java.sql.Date currentDate) {
 
-            java.sql.Date deadline = transactionRepository.getDeadline();
+        java.sql.Date deadline = transactionRepository.getDeadline();
 
-            if (deadline.compareTo(currentDate) < 0) {
+        if (deadline.compareTo(currentDate) < 0) {
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(deadline);
-                calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + 1);
-                java.util.Date newDeadline = calendar.getTime();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(deadline);
+            calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + 1);
+            java.util.Date newDeadline = calendar.getTime();
 
-                SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                String formattedDate = format1.format(newDeadline);
-                LocalDate newDeadlineLocal = LocalDate.parse(formattedDate, formatter);
-                deadline = java.sql.Date.valueOf(newDeadlineLocal);
-            }
+            SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String formattedDate = format1.format(newDeadline);
+            LocalDate newDeadlineLocal = LocalDate.parse(formattedDate, formatter);
+            deadline = java.sql.Date.valueOf(newDeadlineLocal);
+        }
 
 
         return deadline;
     }
 
-    private void newMonthCostUpdate(){
-
-
-
-    }
-
-    private void balanceUpdate(){
-
-    }
 
 
     public int getId() {

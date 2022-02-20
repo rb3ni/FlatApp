@@ -125,4 +125,60 @@ public class BlockRepository {
         }
         return idList;
     }
+
+    public void deadlineSetter(Date newDeadline, int block_id) {
+        String overwriteStatement = "UPDATE block " +
+                "SET payment_deadline = ? WHERE id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(overwriteStatement)) {
+            preparedStatement.setDate(1, newDeadline);
+            preparedStatement.setInt(2, block_id);
+            preparedStatement.executeUpdate();
+        } catch (
+                SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        System.out.println("New payment deadline is: " + newDeadline);
+    }
+
+    public void newMonthCostUpdate(int block_id) {
+        List<Integer> spaceIds = new ArrayList<>();
+        List<Integer> balances = new ArrayList<>();
+        List<Integer> costs = new ArrayList<>();
+        String search = "SELECT s.id AS space_id, balance, cost  " +
+                "FROM space s " +
+                "JOIN space_type st ON st.space_type = s.space_type " +
+                "WHERE st.block_id = ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(search)) {
+            preparedStatement.setInt(1, block_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                spaceIds.add(resultSet.getInt("space_id"));
+                balances.add(resultSet.getInt("balance"));
+                costs.add(resultSet.getInt("cost"));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        String update = "UPDATE space " +
+                "SET balance = ? WHERE id = ?";
+
+        try (PreparedStatement preparedStatement1 = connection.prepareStatement(update)) {
+            for (int i = 0; i < spaceIds.size(); i++) {
+                preparedStatement1.setInt(1, (balances.get(i) - costs.get(i)));
+                preparedStatement1.setInt(2, spaceIds.get(i));
+                preparedStatement1.addBatch();
+            }
+
+            preparedStatement1.executeBatch();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
 }
+

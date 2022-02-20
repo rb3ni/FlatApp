@@ -116,22 +116,43 @@ public class SpaceRepository {
         return null;
     }
 
-    public List<Integer> accountIdListFake() {
-        List<Integer> idList = new ArrayList<>();
-        String sql = "SELECT * FROM property_table";
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                idList.add(resultSet.getInt("id"));
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return idList;
-    }
-
-
+//    public List<Space> allSpaces(int block_id) {
+//        List<Space> spaces = new ArrayList<>();
+//        String sql = "SELECT s.id AS space_id, s.floor, s.door  " +
+//                "FROM property_table pt " +
+//                "JOIN space s ON s.id = pt.space_id " +
+//                "JOIN space_type st ON st.space_type = s.space_type " +
+//                "WHERE st.block_id = ?" +
+//                "ORDER BY space_id ASC;";
+//
+//        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+//            preparedStatement.setInt(1, block_id);
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//
+//            while (resultSet.next()) {
+//                spaces.add(new Space(
+//                        resultSet.getInt("space_id"),
+//                        resultSet.getInt("floor"),
+//                        resultSet.getInt("door"),
+//
+//
+//                ));
+//
+//
+//
+////                this.id = id;
+////                this.floor = floor;
+////                this.door = door;
+////                this.habitants = habitants;
+////                this.spaceType = spaceType;
+////                this.blockId = blockId;
+////                this.balance = balance;
+//
+//            }
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
+//        //return idList;
+//    }
 
 }

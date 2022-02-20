@@ -1,6 +1,5 @@
 package hu.repository;
 
-import hu.domain.space.Space;
 import hu.repository.accountRepositories.AccountRepository;
 
 import java.io.BufferedReader;
@@ -11,7 +10,6 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
@@ -50,7 +48,6 @@ public class TransactionRepository {
     }
 
     public void readTransactions(String path) {
-        List<Integer> unassertedTransactionIds = new ArrayList<>();
 
         Path transactionPath = Path.of(path);
         try (BufferedReader bufferedReader = Files.newBufferedReader(transactionPath)) {
@@ -70,9 +67,6 @@ public class TransactionRepository {
 
     public String createNewTransaction(String[] transactionData) {
         String infoBack = "Issue with creating new transaction";
-        int accountNumber = Integer.parseInt(transactionData[0]);
-        Date date = (java.sql.Date) dateFormatter(transactionData[2]);
-        Time time = timeFormatter(transactionData[2]);
         String transactionNumber = transactionData[5];
 
         if (isNotDuplicate(transactionNumber)) {
@@ -160,7 +154,6 @@ public class TransactionRepository {
             if (transactionText.contains(integer.toString())) {
                 accountIdFound = integer;
                 balanceUpdate(accountIdFound, amount);
-                //TODO itt száll el
                 break;
             }
         }
@@ -239,7 +232,6 @@ public class TransactionRepository {
     private void balanceUpdateDecider(List<Integer> spaceIds, List<Integer> balances, List<Integer> costs, int amount) {
         int numbrOfSpaces = spaceIds.size();
         int remainingCost = amount;
-        int costToAdd = 0;
         boolean hasDebt = true;
 
         while (remainingCost != 0) {
@@ -279,7 +271,12 @@ public class TransactionRepository {
         }
     }
 
+    public String assignAccountManuallyByTransactionNumber() {
 // TODO public assignAccountManuallyByTransactionNumber
+
+
+        return null;
+    }
 
 }
 

@@ -29,6 +29,7 @@ public class SandBox {
 
     public static void main(String[] args) {
         SandBox sandBox = new SandBox();
+        PropertyTableRepository propertyTableRepository = new PropertyTableRepository();
         TransactionRepository transactionRepository = new TransactionRepository();
         SpaceRepository spaceRepository = new SpaceRepository();
         AccountRepository accountRepository = new AccountRepository();
@@ -78,6 +79,8 @@ public class SandBox {
         //System.out.println(accountRepository.accountIdList());
         //System.out.println(sandBox.isNotDuplicate("7765GJJJH7"));
         //System.out.println(sandBox.isNotDuplicate("TR9876FSAF"));
+        accountRepository.overwriteAccountIdByName("Matt Damon", 222222);
+        propertyTableRepository.assignHabitantAndSpace(222222, 1);
 
     }
 

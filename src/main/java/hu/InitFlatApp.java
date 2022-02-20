@@ -166,16 +166,18 @@ public class InitFlatApp {
 
         block = new Block(1, "Macondo", 4321, "Fő út", 1, "", 40, 5, null, null, deadline, startingDate);
 
-        blockRepository.createNewBlock(block);
 
-        System.out.println(transactionRepository.unassignedTransactions());
 
         propertyTableRepository.assignHabitantAndSpace(111111, 1);
         propertyTableRepository.assignHabitantAndSpace(111111, 2);
-        transactionRepository.readTransactions("src/main/resources/Transactions22_02.csv");
         System.out.println(propertyTableRepository.searchSpacesByHabitantId(111111));
+        accountRepository.overwriteAccountIdByName("Matt Damon", 222222);
+        propertyTableRepository.assignHabitantAndSpace(222222, 1);
 
-        //block.updateTransactions();
+
+        blockRepository.createNewBlock(block);
+        block.updateTransactions("src/main/resources/Transactions22_02.csv");
+        System.out.println(transactionRepository.unassignedTransactions());
 
     }
 

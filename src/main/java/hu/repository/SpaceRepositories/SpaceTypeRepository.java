@@ -1,8 +1,13 @@
 package hu.repository.SpaceRepositories;
 
+import hu.domain.account.Account;
+import hu.domain.event.Complain;
+import hu.domain.space.Space;
 import hu.domain.space.SpaceType;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static hu.repository.DatabaseConfigFlatApp.*;
 
@@ -57,6 +62,7 @@ public class SpaceTypeRepository {
         }
         return infoBack;
     }
+
 
 }
 
