@@ -70,7 +70,7 @@ public class TransactionRepository {
         String transactionNumber = transactionData[5];
 
         if (isNotDuplicate(transactionNumber)) {
-            System.out.println(transactionCreateHelper(transactionData));
+            transactionCreateHelper(transactionData);
             infoBack = "Transaction " + transactionData[5] + " saved";
         } else {
             infoBack = "Transaction " + transactionData[5] + " already saved";
