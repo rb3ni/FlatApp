@@ -32,7 +32,7 @@ public class AccountRepository {
                 "responsibility VARCHAR(50), " +
                 "cost INT, " +
                 "is_habitant BOOLEAN NOT NULL, " +
-                "occupation VARCHAR(30), " +
+                "occupation VARCHAR(100), " +
                 "age INT, " +
                 "company_name VARCHAR(30));";
         try (Statement statement = connection.createStatement()) {

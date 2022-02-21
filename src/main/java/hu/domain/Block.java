@@ -101,7 +101,6 @@ public class Block {
             deadline = java.sql.Date.valueOf(newDeadlineLocal);
         }
 
-
         return deadline;
     }
 
