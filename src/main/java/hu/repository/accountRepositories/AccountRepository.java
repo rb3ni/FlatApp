@@ -63,7 +63,7 @@ public class AccountRepository {
             } else {
                 preparedStatement.setBoolean(7, false);
                 preparedStatement.setString(8, null);
-                preparedStatement.setNull(9,Types.INTEGER);
+                preparedStatement.setNull(9, Types.INTEGER);
                 preparedStatement.setString(10, ((ExternalService) account).getCompanyName());
             }
             preparedStatement.executeUpdate();
@@ -177,7 +177,7 @@ public class AccountRepository {
         return idList;
     }
 
-    public void overwriteAccountIdByName(String name, int newId){
+    public void overwriteAccountIdByName(String name, int newId) {
         String infoBack = "overwrite failed!";
 
         String overwriteStatement = "UPDATE account " +
@@ -195,12 +195,71 @@ public class AccountRepository {
     }
 
     public List<Account> searchAccountsBySpace(int floor, int door) {
-        // TODO
-        return null;
+        List<Account> accountList = new ArrayList<>();
+        String sql = "SELECT * FROM space s\n" +
+                "JOIN property_table pt ON pt.space_id=s.id " +
+                "JOIN account a ON pt.account_id=a.id " +
+                "WHERE floor = ?" +
+                "door = ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, floor);
+            preparedStatement.setInt(2, door);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                if (resultSet.getBoolean("a.is_habitant")) {
+                    Account account = new Habitant(
+                            resultSet.getInt("a.id"),
+                            resultSet.getString("a.name"),
+                            resultSet.getInt("a.phone_number"),
+                            resultSet.getString("a.email"),
+                            resultSet.getString("a.responsibility"),
+                            resultSet.getInt("a.cost"),
+                            resultSet.getInt("a.age"),
+                            resultSet.getString("a.occupation"));
+                    accountList.add(account);
+                } else {
+                    Account account = new ExternalService(
+                            resultSet.getInt("a.id"),
+                            resultSet.getString("a.name"),
+                            resultSet.getInt("a.phone_number"),
+                            resultSet.getString("a.email"),
+                            resultSet.getString("a.responsibility"),
+                            resultSet.getInt("a.cost"),
+                            resultSet.getString("a.company_name"));
+                    accountList.add(account);
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return accountList;
     }
 
     public List<ExternalService> listAllExternalService() {
-        //TODO
-        return null;
+        List<ExternalService> accountList = new ArrayList<>();
+        String sql = "SELECT * FROM account a\n" +
+                "WHERE a.is_habitant = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, 0);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                ExternalService externalService = new ExternalService(
+                        resultSet.getInt("a.id"),
+                        resultSet.getString("a.name"),
+                        resultSet.getInt("a.phone_number"),
+                        resultSet.getString("a.email"),
+                        resultSet.getString("a.responsibility"),
+                        resultSet.getInt("a.cost"),
+                        resultSet.getString("a.company_name"));
+                accountList.add(externalService);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return accountList;
     }
 }

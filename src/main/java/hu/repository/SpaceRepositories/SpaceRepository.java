@@ -69,11 +69,11 @@ public class SpaceRepository {
 
 
             while (resultSet.next()) {
-            int spaceFloor = resultSet.getInt("floor");
-            int spaceDoor = resultSet.getInt("door");
-            String spaceType = resultSet.getString("space_type");
-            Integer blockId = resultSet.getInt("block_id");
-            int balance = resultSet.getInt("balance");
+                int spaceFloor = resultSet.getInt("floor");
+                int spaceDoor = resultSet.getInt("door");
+                String spaceType = resultSet.getString("space_type");
+                Integer blockId = resultSet.getInt("block_id");
+                int balance = resultSet.getInt("balance");
                 space = new Space(id, spaceFloor, spaceDoor, null, spaceType, blockId, balance); // TODO ez miért van whileban?
             }
         } catch (SQLException throwables) {
@@ -101,9 +101,7 @@ public class SpaceRepository {
             Integer blockId = resultSet.getInt("block_id");
             int balance = resultSet.getInt("balance");
 
-            do {
-                space = new Space(spaceId, spaceFloor, spaceDoor, null, spaceType, blockId, balance);
-            } while (resultSet.next());
+            space = new Space(spaceId, spaceFloor, spaceDoor, null, spaceType, blockId, balance);
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -112,8 +110,38 @@ public class SpaceRepository {
     }
 
     public List<Space> searchSpacesByAccountNameAndEmail(String nameForSpaces, String emailForSpaces) {
-        //TODO
-        return null;
+        List<Space> spaceList = new ArrayList<>();
+
+        String sql = "SELECT * FROM space s\n" +
+                "JOIN property_table pt ON pt.space_id=s.id " +
+                "JOIN account a ON pt.account_id=a.id " +
+                "WHERE a.name LIKE ?" +
+                "a.email LIKE ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, nameForSpaces);
+            preparedStatement.setString(2, emailForSpaces);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            resultSet.next();
+            List<Integer> accountIds = new ArrayList<>();
+            accountIds.add(resultSet.getInt("a.id"));
+
+            do {
+                int spaceId = resultSet.getInt("id");
+                int spaceFloor = resultSet.getInt("floor");
+                int spaceDoor = resultSet.getInt("door");
+                String spaceType = resultSet.getString("space_type");
+                Integer blockId = resultSet.getInt("block_id");
+                int balance = resultSet.getInt("balance");
+                Space space = new Space(spaceId, spaceFloor, spaceDoor, accountIds, spaceType, blockId, balance);
+                spaceList.add(space);
+            } while ((resultSet.next()));
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return spaceList;
     }
 
 //    public List<Space> allSpaces(int block_id) {
