@@ -50,6 +50,8 @@ public class Initialization {
         initialization.setSpaces();
         initialization.assignSpaces();
         initialization.writeTransactions("src/main/resources/transactions/2022_01.csv");
+        initialization.writeTransactions("src/main/resources/transactions/2022_02.csv");
+
 
         Block block;
         String deadLineS = "2022-01-15";
@@ -61,7 +63,7 @@ public class Initialization {
         Date startingDate = java.sql.Date.valueOf(startingDateLocal);
         block = new Block(1, "Macondo", 4321, "Main street", 1, "", 86, 9, null, null, deadline, startingDate);
         blockRepository.createNewBlock(block);
-        block.updateTransactions("src/main/resources/transactions/2022_01.csv");
+        //block.updateTransactions("src/main/resources/transactions/2022_01.csv");
 
     }
 
