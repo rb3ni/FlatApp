@@ -71,8 +71,6 @@ public class BlockRepository {
     public Block searchBlockById(int id) {
         Block block = null;
         String sql = "SELECT * FROM block b " +
-                "JOIN space s ON s.block_id=b.id " +
-                "JOIN property_table pt ON s.id= pt.space_id " +
                 "WHERE b.id = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -88,12 +86,12 @@ public class BlockRepository {
             int numberOfSpaces = resultSet.getInt("number_of_spaces");
             int numberOfFloors = resultSet.getInt("number_of_floors");
             Date paymentDeadLine = resultSet.getDate("payment_deadline");
-            Date startingDate = resultSet.getDate("payment_deadline");
-            List<Integer> spaces = spaceIdList(resultSet);
-            List<Integer> accounts = getAccountsId(resultSet); //Ez már lehet nem fut le így. illetve nem vagyok biztos benne egyáltalán kell mint attributum.
+            Date startingDate = resultSet.getDate("starting_date");
+//            List<Integer> spaces = spaceIdList(resultSet);
+//            List<Integer> accounts = getAccountsId(resultSet); //Ez már lehet nem fut le így. illetve nem vagyok biztos benne egyáltalán kell mint attributum.
 
             return new Block(id, city, postalCode, street, houseNumber, description, numberOfSpaces,
-                    numberOfFloors, spaces, accounts, paymentDeadLine, startingDate);
+                    numberOfFloors, null, null, paymentDeadLine, startingDate);
 
 
         } catch (SQLException throwables) {
