@@ -1,8 +1,13 @@
 package hu;
 
+import hu.domain.Block;
 import hu.domain.account.Account;
 import hu.domain.account.ExternalService;
 import hu.domain.account.Habitant;
+import hu.domain.event.Complain;
+import hu.domain.event.Emergency;
+import hu.domain.event.Event;
+import hu.domain.event.Reminder;
 import hu.domain.space.Space;
 import hu.repository.BlockRepository;
 import hu.repository.EventRepositories.EventRepository;
@@ -14,10 +19,15 @@ import hu.repository.TransactionRepository;
 import hu.repository.accountRepositories.AccountRepository;
 import hu.ui.Ui;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class FlatAppMenu {
 
+    Block block;
     AccountRepository aR = new AccountRepository();
     BlockRepository bR = new BlockRepository();
     EventRepository eR = new EventRepository();
@@ -30,13 +40,13 @@ public class FlatAppMenu {
 
     public void printFlatAppSystemMenu() {
         System.out.println("Press number for choose between options");
-        System.out.println("1: Upload transactions from csv file"); // String "Path" submenu: check trans(Unassigned) és reminder kiküldés??
-        System.out.println("2: Check debts"); // List<Account>
-        System.out.println("3: Check balance"); //Account(emailel)
-        System.out.println("4: Search Accounts by Space"); // List<Account> (floor, door)
-        System.out.println("5: Search Spaces by Account"); // List<space> (név, email)
-        System.out.println("6: List all external services"); // List<ExternalServices>
-        System.out.println("7: Create new Account and save to database"); // submenu external or habitant
+        System.out.println("1: Upload transactions from csv file");
+        System.out.println("2: Check debts");
+        System.out.println("3: Check balance");
+        System.out.println("4: Search Accounts by Space");
+        System.out.println("5: Search Spaces by Account");
+        System.out.println("6: List all external services");
+        System.out.println("7: Create new Account and save to database");
         System.out.println("8: Create new Event");
         System.out.println("9: Quit");
     }
@@ -61,20 +71,20 @@ public class FlatAppMenu {
                     System.out.print("Please give the path of the file: ");
                     String path = ui.askTextFromUser();
 
-                    tR.readTransactions(path);
-                    // TODO Innen egyelőre nem látom még hogyan tovább.
-                    uploadTransactionSubMenu(); // van erre szükség egyáltalán?
-                    // List<Account> misssingAccounts = checkMissingAccountsFromTransactions();
-                    // addAccountManuallyToAccounts();
+                    block.updateTransactions(path);
                     break;
                 case 2:
                     // TODO transaction method for this?
 
                     break;
                 case 3:
-                    System.out.print("Give Account email: ");
-                    String email = ui.askTextFromUser();
-                    System.out.print(aR.searchAccountByEmail(email));
+                    System.out.print("Give space's floor: ");
+                    int floorBalance = ui.askIntFromUser();
+                    System.out.print("Give space's door number: ");
+                    int doorBalance = ui.askIntFromUser();
+
+                    Space space = sR.searchSpacesByFloorAndDoor(floorBalance, doorBalance);
+                    System.out.print("Balance: " + space.getBalance());
                     break;
                 case 4:
                     System.out.print("Give space's floor: ");
@@ -100,10 +110,10 @@ public class FlatAppMenu {
                     break;
                 case 7:
                     createNewAccountSubMenu();
-                    System.out.println();
+                    System.out.println("Account saved");
                     break;
                 case 8:
-
+                    createNewEventSubMenu();
                     break;
                 case 9:
                     flag = false;
@@ -111,6 +121,130 @@ public class FlatAppMenu {
         }
     }
 
+    private void createNewEventSubMenu() {
+        System.out.println("Press number for choose between options");
+        System.out.println("1: Create new Complain");
+        System.out.println("2: Create new Emergency");
+        System.out.println("3: Create new Reminder");
+        System.out.println("4: Create new other Event");
+        int userInput = ui.askIntFromUser();
+
+        List<String> eventDatas = askEventDatas();
+        List<Date> dates = getEventDates(eventDatas.get(2));
+
+        switch (userInput) {
+            case 1:
+                System.out.print("Give your email: ");
+                String senderComplainEmail = ui.askTextFromUser();
+                Account senderComplain = aR.searchAccountByEmail(senderComplainEmail);
+
+                System.out.print("Send complain to: (Example: email1, email2, email3)");
+                String receiversEmail = ui.askTextFromUser();
+                List<Account> receivers = getReceivers(receiversEmail);
+
+                eR.createNewEvent(new Complain(eventDatas.get(0), eventDatas.get(1), dates.get(0),
+                        dates.get(1), senderComplain, receivers));
+                break;
+            case 2:
+                System.out.print("Give your email: ");
+                String senderEmergencyEmail = ui.askTextFromUser();
+                Account senderEmergency = aR.searchAccountByEmail(senderEmergencyEmail);
+
+                List<Space> affectedSpaces = giveAffectedSpaces(userInput);
+
+                eR.createNewEvent(new Emergency(eventDatas.get(0), eventDatas.get(1), dates.get(0),
+                        dates.get(1), senderEmergency, affectedSpaces));
+                break;
+            case 3:
+                List<Space> affectedSpacesReminder = giveAffectedSpaces(userInput);
+
+                eR.createNewEvent(new Reminder(eventDatas.get(0), eventDatas.get(1), dates.get(0),
+                        dates.get(1), affectedSpacesReminder));
+                break;
+            case 4:
+                eR.createNewEvent(new Event(eventDatas.get(0), eventDatas.get(1), dates.get(0),
+                        dates.get(1)));
+        }
+    }
+
+    private List<Space> giveAffectedSpaces(int previousUserInput) {
+        if (previousUserInput == 2) {
+            System.out.println("Press number for choose between options");
+            System.out.println("1: Add Space to Emergency");
+            System.out.println("2: Send Emergency");
+        } else {
+            System.out.println("Press number for choose between options");
+            System.out.println("1: Add Space to Reminder");
+            System.out.println("2: Send Reminder");
+        }
+
+        int userInput = ui.askIntFromUser();
+        boolean flag = true;
+        List<Space> affectedSpaces = new ArrayList<>();
+
+        while (flag) {
+            switch (userInput) {
+                case 1:
+                    System.out.print("Give affected space's floor: ");
+                    int floor = ui.askIntFromUser();
+                    System.out.print("Give affected space's door number: ");
+                    int door = ui.askIntFromUser();
+
+                    Space affectedSpace = sR.searchSpacesByFloorAndDoor(floor, door);
+                    affectedSpaces.add(affectedSpace);
+                    break;
+                case 2:
+                    flag = false;
+                    break;
+            }
+        }
+        return affectedSpaces;
+    }
+
+    private List<Account> getReceivers(String receiversEmail) {
+        List<Account> receivers = new ArrayList<>();
+
+        String[] emails = receiversEmail.split(", ");
+        for (int i = 0; i < emails.length; i++) {
+            Account receiver = aR.searchAccountByEmail(emails[i]);
+            receivers.add(receiver);
+        }
+        return receivers;
+    }
+
+    private List<Date> getEventDates(String eventDate) {
+        List<Date> dates = new ArrayList<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date(System.currentTimeMillis());
+        String formattedDate = formatter.format(date);
+
+        try {
+            Date newDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(eventDate);
+            Date newEventDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(formattedDate);
+            dates.add(newDateFormat);
+            dates.add(newEventDateFormat);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dates;
+    }
+
+    private List<String> askEventDatas() {
+        List<String> eventDatas = new ArrayList<>();
+
+        System.out.println("Give the name of the event: ");
+        String name = ui.askTextFromUser();
+        System.out.println("Give a description: ");
+        String description = ui.askTextFromUser();
+        System.out.println("Give the date of the event: ");
+        String eventDate = ui.askTextFromUser();
+
+        eventDatas.add(name);
+        eventDatas.add(description);
+        eventDatas.add(eventDate);
+
+        return eventDatas;
+    }
 
     private void createNewAccountSubMenu() {
         System.out.println("Press number for choose between options");
@@ -118,35 +252,44 @@ public class FlatAppMenu {
         System.out.println("2: Create new External Service");
         int userInput = ui.askIntFromUser();
 
+        List<String> accountData = askAccountDatas();
+
         switch (userInput) {
             case 1:
-                System.out.print("Give name: ");
-                String name = ui.askTextFromUser();
-                System.out.print("Give phone number: ");
-                int phoneNumber = ui.askIntFromUser();
-                System.out.print("Give email: ");
-                String email = ui.askTextFromUser();
-                System.out.print("Give responsibility: ");
-                String responsibility = ui.askTextFromUser();
-                System.out.print("Give cost: ");
-                int cost = ui.askIntFromUser();
                 System.out.print("Give age: ");
                 int age = ui.askIntFromUser();
                 System.out.print("Give occupation: ");
                 String occupation = ui.askTextFromUser();
-                //TODO
-                aR.createNewAccount(new Habitant(name, phoneNumber, email, responsibility, cost, age, occupation));
+
+                aR.createNewAccount(new Habitant(accountData.get(0), Integer.parseInt(accountData.get(1)),
+                        accountData.get(2), accountData.get(3), 0, age, occupation));
                 break;
             case 2:
-                // TODO transaction method for this?
+                System.out.print("Give companyName: ");
+                String companyName = ui.askTextFromUser();
+
+                aR.createNewAccount(new ExternalService(accountData.get(0), Integer.parseInt(accountData.get(1)),
+                        accountData.get(2), accountData.get(3), 0, companyName));
                 break;
         }
     }
 
-    private void uploadTransactionSubMenu() {
-        System.out.println("Press number for choose between options");
-        System.out.println("1: Check missing Accounts from Transactions"); // Nem biztos hogy ez az egész kell
-        System.out.println("2: Create new External Service");
-        int userInput = ui.askIntFromUser();
+    private List<String> askAccountDatas() {
+        List<String> accountDatas = new ArrayList<>();
+        System.out.print("Give name: ");
+        String name = ui.askTextFromUser();
+        System.out.print("Give phone number: ");
+        int phoneNumber = ui.askIntFromUser();
+        System.out.print("Give email: ");
+        String email = ui.askTextFromUser();
+        System.out.print("Give responsibility: ");
+        String responsibility = ui.askTextFromUser();
+
+        accountDatas.add(name);
+        accountDatas.add(Integer.toString(phoneNumber));
+        accountDatas.add(email);
+        accountDatas.add(responsibility);
+
+        return accountDatas;
     }
 }

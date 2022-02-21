@@ -1,0 +1,34 @@
+ _________________________________________________________________________________________
+|              |              |              |              |              |              |
+|  SpaceTypeC  |   SpaceTypeB |   SpaceTypeA |   SpaceTypeA |   SpaceTypeB |   SpaceTypeC |        # Floor 9                                                                      |
+|______________|______________|______________|______________|______________|______________|
+|              |              |              |              |              |              |
+|  SpaceTypeC  |   SpaceTypeB |   SpaceTypeA |   SpaceTypeA |   SpaceTypeB |   SpaceTypeC |        # Floor 8
+|_________________________________________________________________________________________|
+|              |              |              |              |              |              |
+|  SpaceTypeC  |   SpaceTypeB |   SpaceTypeA |   SpaceTypeA |   SpaceTypeB |   SpaceTypeC |        # Floor 7                                                                      |
+|______________|______________|______________|______________|______________|______________|
+|              |              |              |              |              |              |
+|  SpaceTypeC  |   SpaceTypeB |   SpaceTypeA |   SpaceTypeA |   SpaceTypeB |   SpaceTypeC |        # Floor 6                                                                   |
+|______________|______________|______________|______________|______________|______________|
+|              |              |              |              |              |              |
+|  SpaceTypeC  |   SpaceTypeB |   SpaceTypeA |   SpaceTypeA |   SpaceTypeB |   SpaceTypeC |        # Floor 5                                                                   |
+|______________|______________|______________|______________|______________|______________|
+|              |              |              |              |              |              |
+|  SpaceTypeC  |   SpaceTypeB |   SpaceTypeA |   SpaceTypeA |   SpaceTypeB |   SpaceTypeC |        # Floor 4                                                                   |
+|______________|______________|______________|______________|______________|______________|
+|              |              |              |              |              |              |
+|  SpaceTypeC  |   SpaceTypeB |   SpaceTypeA |   SpaceTypeA |   SpaceTypeB |   SpaceTypeC |        # Floor 3                                                                   |
+|______________|______________|______________|______________|______________|______________|
+|              |              |              |              |              |              |
+|  SpaceTypeC  |   SpaceTypeB |   SpaceTypeA |   SpaceTypeA |   SpaceTypeB |   SpaceTypeC |        # Floor 2                                                             |
+|______________|______________|______________|______________|______________|______________|
+|              |              |              |              |              |              |
+|  SpaceTypeC  |   SpaceTypeB |   SpaceTypeA |   SpaceTypeA |   SpaceTypeB |   SpaceTypeC |        # Floor 1                                                              |
+|______________|______________|______________|______________|______________|______________|
+|                                                                                         |
+|                                       businessSpace                                     |        # Floor 0                                                          |
+|_________________________________________________________________________________________|
+|                             |                             |                             |
+|         parkingSlot         |         parkingSlot         |         parkingSlot         |        # Floor -1                                                              |
+|_____________________________|_____________________________|_____________________________|
