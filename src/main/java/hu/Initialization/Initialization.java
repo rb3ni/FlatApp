@@ -218,11 +218,11 @@ public class Initialization {
 
         habitantIds = accountRepository.accountIdList();
 
-        for (int i = 1; i < 86; i++) {
-            if (i < 57) {
-                propertyTableRepository.assignHabitantAndSpace(habitantIds.get(i), i);
+        for (int i = 1; i <= 86; i++) {
+            if (i <= 58) {
+                propertyTableRepository.assignHabitantAndSpace(habitantIds.get(i-1), i);
             } else {
-                propertyTableRepository.assignHabitantAndSpace(habitantIds.get(i), random.nextInt(56) + 1);
+                propertyTableRepository.assignHabitantAndSpace(habitantIds.get(i-1), (random.nextInt(55) + 1));
             }
         }
 
