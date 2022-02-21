@@ -115,7 +115,8 @@ public class SpaceRepository {
         String sql = "SELECT * FROM space s\n" +
                 "JOIN property_table pt ON pt.space_id=s.id " +
                 "JOIN account a ON pt.account_id=a.id " +
-                "WHERE a.name LIKE ?" +
+                "JOIN space_type st ON st.space_type=s.space_type " +
+                "WHERE a.name LIKE ? AND " +
                 "a.email LIKE ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -128,12 +129,12 @@ public class SpaceRepository {
             accountIds.add(resultSet.getInt("a.id"));
 
             do {
-                int spaceId = resultSet.getInt("id");
-                int spaceFloor = resultSet.getInt("floor");
-                int spaceDoor = resultSet.getInt("door");
-                String spaceType = resultSet.getString("space_type");
-                Integer blockId = resultSet.getInt("block_id");
-                int balance = resultSet.getInt("balance");
+                int spaceId = resultSet.getInt("s.id");
+                int spaceFloor = resultSet.getInt("s.floor");
+                int spaceDoor = resultSet.getInt("s.door");
+                String spaceType = resultSet.getString("s.space_type");
+                Integer blockId = resultSet.getInt("st.block_id");
+                int balance = resultSet.getInt("s.balance");
                 Space space = new Space(spaceId, spaceFloor, spaceDoor, accountIds, spaceType, blockId, balance);
                 spaceList.add(space);
             } while ((resultSet.next()));

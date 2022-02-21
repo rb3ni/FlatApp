@@ -199,7 +199,7 @@ public class AccountRepository {
         String sql = "SELECT * FROM space s\n" +
                 "JOIN property_table pt ON pt.space_id=s.id " +
                 "JOIN account a ON pt.account_id=a.id " +
-                "WHERE floor = ?" +
+                "WHERE floor = ? AND " +
                 "door = ?;";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

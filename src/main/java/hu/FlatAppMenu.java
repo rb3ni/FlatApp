@@ -21,13 +21,14 @@ import hu.ui.Ui;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class FlatAppMenu {
 
-    Block block;
     AccountRepository aR = new AccountRepository();
     BlockRepository bR = new BlockRepository();
     EventRepository eR = new EventRepository();
@@ -68,9 +69,10 @@ public class FlatAppMenu {
             int userInput = ui.askIntFromUser();
             switch (userInput) {
                 case 1:
-                    System.out.print("Please give the path of the file: ");
+                    System.out.print("Give the path of the file: ");
                     String path = ui.askTextFromUser();
 
+                    Block block = bR.searchBlockById(1);
                     block.updateTransactions(path);
                     break;
                 case 2:
@@ -130,7 +132,7 @@ public class FlatAppMenu {
         int userInput = ui.askIntFromUser();
 
         List<String> eventDatas = askEventDatas();
-        List<Date> dates = getEventDates(eventDatas.get(2));
+        List<java.sql.Date> dates = getEventDates(eventDatas.get(2));
 
         switch (userInput) {
             case 1:
@@ -138,7 +140,7 @@ public class FlatAppMenu {
                 String senderComplainEmail = ui.askTextFromUser();
                 Account senderComplain = aR.searchAccountByEmail(senderComplainEmail);
 
-                System.out.print("Send complain to: (Example: email1, email2, email3)");
+                System.out.print("Send complain to: (Example: email1, email2, email3) ");
                 String receiversEmail = ui.askTextFromUser();
                 List<Account> receivers = getReceivers(receiversEmail);
 
@@ -168,21 +170,23 @@ public class FlatAppMenu {
     }
 
     private List<Space> giveAffectedSpaces(int previousUserInput) {
-        if (previousUserInput == 2) {
-            System.out.println("Press number for choose between options");
-            System.out.println("1: Add Space to Emergency");
-            System.out.println("2: Send Emergency");
-        } else {
-            System.out.println("Press number for choose between options");
-            System.out.println("1: Add Space to Reminder");
-            System.out.println("2: Send Reminder");
-        }
-
-        int userInput = ui.askIntFromUser();
         boolean flag = true;
         List<Space> affectedSpaces = new ArrayList<>();
 
         while (flag) {
+
+            if (previousUserInput == 2) {
+                System.out.println("Press number for choose between options");
+                System.out.println("1: Add Space to Emergency");
+                System.out.println("2: Send Emergency");
+            } else {
+                System.out.println("Press number for choose between options");
+                System.out.println("1: Add Space to Reminder");
+                System.out.println("2: Send Reminder");
+            }
+
+            int userInput = ui.askIntFromUser();
+
             switch (userInput) {
                 case 1:
                     System.out.print("Give affected space's floor: ");
@@ -212,31 +216,30 @@ public class FlatAppMenu {
         return receivers;
     }
 
-    private List<Date> getEventDates(String eventDate) {
-        List<Date> dates = new ArrayList<>();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date(System.currentTimeMillis());
-        String formattedDate = formatter.format(date);
+    private List<java.sql.Date> getEventDates(String eventDate) {
+        List<java.sql.Date> dates = new ArrayList<>();
 
-        try {
-            Date newDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(eventDate);
-            Date newEventDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(formattedDate);
-            dates.add(newDateFormat);
-            dates.add(newEventDateFormat);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        java.util.Date date = new java.util.Date();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate eventDateLocal = LocalDate.parse(eventDate, formatter);
+        java.sql.Date eventDateSql = java.sql.Date.valueOf(eventDateLocal);
+
+        dates.add(sqlDate);
+        dates.add(eventDateSql);
+
         return dates;
     }
 
     private List<String> askEventDatas() {
         List<String> eventDatas = new ArrayList<>();
 
-        System.out.println("Give the name of the event: ");
+        System.out.print("Give the name of the event: ");
         String name = ui.askTextFromUser();
-        System.out.println("Give a description: ");
+        System.out.print("Give a description: ");
         String description = ui.askTextFromUser();
-        System.out.println("Give the date of the event: ");
+        System.out.print("Give the date of the event: ");
         String eventDate = ui.askTextFromUser();
 
         eventDatas.add(name);
