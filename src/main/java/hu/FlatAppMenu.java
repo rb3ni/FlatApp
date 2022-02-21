@@ -74,7 +74,9 @@ public class FlatAppMenu {
                     block.updateTransactions(path);
                     break;
                 case 2:
-                    // TODO transaction method for this?
+                    System.out.print("The following spaces have debt:");
+                    System.out.println();
+                    tR.checkDebts();
 
                     break;
                 case 3:

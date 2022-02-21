@@ -273,9 +273,41 @@ public class TransactionRepository {
 
     public String assignAccountManuallyByTransactionNumber() {
 // TODO public assignAccountManuallyByTransactionNumber
-
-
         return null;
+    }
+
+
+    public List<Integer> checkDebts() {
+        PropertyTableRepository propertyTableRepository = new PropertyTableRepository();
+        List<Integer> spacesWithDebt = new ArrayList<>();
+
+        String sql = "SELECT pt.account_id AS account_id, s.id AS space_id, s.balance " +
+                "FROM property_table pt " +
+                "JOIN space s ON s.id = pt.space_id " +
+                "WHERE s.balance < 0;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                List<Integer> habitantIds = new ArrayList<>();
+                int spaceWithDebt = resultSet.getInt("space_id");
+
+                if (!spacesWithDebt.contains(spaceWithDebt)) {
+                    spacesWithDebt.add(spaceWithDebt);
+                    habitantIds = propertyTableRepository.searchHabitantsBySpaceId(spaceWithDebt);
+
+                    System.out.println("Space with id: " + spaceWithDebt + " has " +
+                            resultSet.getInt("s.balance") + " unpayed cost! Habitants: " + habitantIds.toString());
+                }
+
+            }
+
+        } catch (
+                SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return spacesWithDebt;
     }
 
 }

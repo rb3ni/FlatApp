@@ -100,5 +100,26 @@ public class PropertyTableRepository {
         }
         return isNotDuplicate;
     }
+
+    public List<Integer> searchHabitantsBySpaceId(int id) {
+        List<Integer> habitantIds = new ArrayList<>();
+        String sql = "SELECT * FROM property_table pt " +
+                "JOIN space s ON s.id = pt.space_id " +
+                "WHERE s.id = ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                habitantIds.add(resultSet.getInt("pt.account_id"));
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return habitantIds;
+    }
+
 }
 
