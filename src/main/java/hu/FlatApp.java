@@ -6,8 +6,8 @@ public class FlatApp {
         FlatAppMenu flatAppMenu = new FlatAppMenu();
         flatAppMenu.startApplication();
 
-        FlatAppMenu flatAppMenu = new FlatAppMenu();
-        flatAppMenu.startApplication();
+        //src/main/resources/transactions/2022_01.csv
+        //src/main/resources/transactions/2022_02.csv
 
     }
 }
