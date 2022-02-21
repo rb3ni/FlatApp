@@ -215,14 +215,15 @@ public class Initialization {
         AccountRepository accountRepository = new AccountRepository();
 
         List<Integer> habitantIds = new ArrayList<>();
-
+        // 86 db habitant, 0----->85
+        // 58 db spaces, 0--->57
         habitantIds = accountRepository.accountIdList();
 
-        for (int i = 1; i < 86; i++) {
-            if (i < 57) {
-                propertyTableRepository.assignHabitantAndSpace(habitantIds.get(i), i);
+        for (int i = 1; i <= 86; i++) {
+            if (i <= 58) {
+                propertyTableRepository.assignHabitantAndSpace(habitantIds.get(i-1), i);
             } else {
-                propertyTableRepository.assignHabitantAndSpace(habitantIds.get(i), random.nextInt(56) + 1);
+                propertyTableRepository.assignHabitantAndSpace(habitantIds.get(i-1), (random.nextInt(55) + 1));
             }
         }
 
