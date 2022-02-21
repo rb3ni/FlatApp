@@ -22,5 +22,8 @@ public class FlatApp {
                 "CEO a Wayne vállalatnál");
 
 
+        FlatAppMenu flatAppMenu = new FlatAppMenu();
+        flatAppMenu.startApplication();
+
     }
 }
